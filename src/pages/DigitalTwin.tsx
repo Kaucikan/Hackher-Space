@@ -25,7 +25,7 @@ export const DigitalTwin = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/digital-twin");
+        const res = await fetch("https://hackher-space-be.onrender.com/api/digital-twin");
         const result = await res.json();
         setData(result || []);
       } catch {
