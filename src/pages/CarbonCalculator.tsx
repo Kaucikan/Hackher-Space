@@ -42,7 +42,7 @@ export default function CarbonCalculator() {
       setLoading(true);
       setError("");
 
-      const res = await fetch("http://localhost:5000/api/carbon", {
+      const res = await fetch("https://hackher-space-be.onrender.com/api/carbon", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -59,7 +59,7 @@ export default function CarbonCalculator() {
       setResult(data);
 
       /* SAVE TO DIGITAL TWIN */
-      await fetch("http://localhost:5000/api/digital-twin", {
+      await fetch("https://hackher-space-be.onrender.com/api/digital-twin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
