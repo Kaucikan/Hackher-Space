@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@theme {
+  /* ---------- COLORS ---------- */
+  --color-primary: #16a34a;        /* green-600 */
+  --color-primary-dark: #15803d;   /* green-700 */
+  --color-secondary: #2563eb;      /* blue-600 */
+  --color-accent: #f59e0b;         /* amber-500 */
+
+  --color-background: #f1f5f9;     /* slate-100 */
+  --color-surface: #ffffff;
+  --color-border: #e2e8f0;
+
+  /* ---------- TEXT ---------- */
+  --color-text: #0f172a;           /* slate-900 */
+  --color-muted: #64748b;          /* slate-500 */
+
+  /* ---------- FONT ---------- */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-slate-900 font-sans antialiased;
+  }
+
+  h1, h2, h3 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+/* ---------- GLASS CARD ---------- */
+.glass {
+  @apply bg-white/80 backdrop-blur-md border border-border shadow-md;
+}
