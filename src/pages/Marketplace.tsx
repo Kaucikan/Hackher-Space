@@ -19,7 +19,7 @@ type Listing = {
   status?: string;
 };
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://hackher-space-be.onrender.com/api";
 const categories = ["All", "Metal", "Energy", "Chemical", "Plastic", "Wood"];
 
 /* -------------------- COMPONENT -------------------- */
