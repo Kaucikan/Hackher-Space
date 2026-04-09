@@ -73,7 +73,7 @@ export const AddWaste = () => {
    try {
      const user = getUser();
 
-     const res = await fetch("http://localhost:5000/api/listings", {
+     const res = await fetch("https://hackher-space-be.onrender.com/api/listings", {
        method: "POST",
        headers: {
          "Content-Type": "application/json",
