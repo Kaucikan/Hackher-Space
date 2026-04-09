@@ -16,7 +16,7 @@ export const LandingPage = () => {
         playsInline
         className="fixed inset-0 w-full h-full object-cover -z-20"
       >
-        <source src="/videos/back.mp4" type="video/mp4" />
+        <source src="https://res.cloudinary.com/dblg4ofdt/video/upload/v1775736182/back_xqwzyp.mp4" type="video/mp4" />
       </video>
 
       {/* OVERLAY */}
