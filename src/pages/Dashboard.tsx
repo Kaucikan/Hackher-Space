@@ -72,13 +72,13 @@ useEffect(() => {
     const fetchData = async () => {
       try {
         const [carbonRes, impactRes, statsRes] = await Promise.all([
-          fetch("http://localhost:5000/api/carbon", {
+          fetch("https://hackher-space-be.onrender.com/api/carbon", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ type: "individual" }),
           }),
-          fetch(`http://localhost:5000/api/impact/${user.id}`),
-          fetch(`http://localhost:5000/api/stats/${user.id}`),
+          fetch(`https://hackher-space-be.onrender.com/api/impact/${user.id}`),
+          fetch(`https://hackher-space-be.onrender.com/api/stats/${user.id}`),
         ]);
 
         const carbonData = await carbonRes.json();
