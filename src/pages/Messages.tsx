@@ -48,7 +48,7 @@ export const Messages = () => {
         const user = JSON.parse(localStorage.getItem("user") || "{}");
 
         const res = await fetch(
-          `http://localhost:5000/api/listings/user/${user.id}`,
+          `https://hackher-space-be.onrender.com/api/listings/user/${user.id}`,
         );
 
         const listings = await res.json();
