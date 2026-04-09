@@ -45,7 +45,7 @@ export const MyListings = () => {
         }
 
         const res = await fetch(
-          `http://localhost:5000/api/listings/user/${user?.id}`,
+          `https://hackher-space-be.onrender.com/api/listings/user/${user?.id}`,
         );
 
         if (!res.ok) throw new Error();
@@ -65,7 +65,7 @@ export const MyListings = () => {
   /* ---------------- DELETE ---------------- */
   const deleteListing = async (id: string) => {
     try {
-      await fetch(`http://localhost:5000/api/listings/${id}`, {
+      await fetch(`https://hackher-space-be.onrender.com/api/listings/${id}`, {
         method: "DELETE",
       });
 
@@ -78,7 +78,7 @@ export const MyListings = () => {
   /* ---------------- UPDATE ---------------- */
   const updateStatus = async (id: string, status: Listing["status"]) => {
     try {
-      await fetch(`http://localhost:5000/api/listings/${id}`, {
+      await fetch(`https://hackher-space-be.onrender.com/api/listings/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
