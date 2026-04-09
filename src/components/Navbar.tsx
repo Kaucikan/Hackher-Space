@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Leaf, Menu, X, Sun, Moon } from "lucide-react";
 import { Button } from "./ui/Button";
 
-/* -------------------- HELPERS -------------------- */
+/* API USER */
 
 const getUser = () => {
   try {
@@ -49,69 +49,43 @@ export const Navbar = () => {
   if (isDashboard) return null;
 
   return (
-    <nav
-      className="fixed top-0 left-0 right-0 z-50 
-    backdrop-blur-2xl bg-black/40 
-    border-b border-white/10 text-white"
-    >
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl bg-black/50 border-b border-white/10 text-white">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
         {/* LOGO */}
         <Link to="/" className="flex items-center gap-2">
           <div className="bg-primary p-2 rounded-xl">
             <Leaf className="text-white w-5 h-5" />
           </div>
 
-          <span className="text-lg font-bold tracking-wide">
+          <span className="text-lg font-bold">
             Waste<span className="text-primary">Exchange</span>
           </span>
         </Link>
 
-        {/* DESKTOP NAV */}
-        <div className="hidden md:flex items-center gap-8">
-          <Link className="font-semibold hover:text-primary transition" to="/">
+        {/* DESKTOP */}
+        <div className="hidden md:flex items-center gap-6">
+          <Link className="hover:text-primary" to="/">
             Home
           </Link>
 
-          <Link
-            className="font-semibold hover:text-primary transition"
-            to="/dashboard/marketplace"
-          >
+          <Link className="hover:text-primary" to="/dashboard/marketplace">
             Marketplace
           </Link>
 
-          <Link
-            className="font-semibold hover:text-primary transition"
-            to="/about"
-          >
+          <Link className="hover:text-primary" to="/about">
             How it Works
-          </Link>
-
-          <Link to="/dashboard/carbon">
-            <Button variant="ghost" className="text-blue-400">
-              Carbon
-            </Button>
-          </Link>
-
-          <Link to="/dashboard/digital-twin">
-            <Button variant="ghost" className="text-blue-400">
-              Digital Twin
-            </Button>
           </Link>
 
           <div className="h-4 w-px bg-white/20" />
 
-          {/* DARK MODE */}
           <Button variant="ghost" size="icon" onClick={toggleDarkMode}>
             {isDark ? <Sun /> : <Moon />}
           </Button>
 
-          {/* AUTH */}
           {user ? (
             <>
               <Link to="/dashboard">
-                <Button variant="ghost" className="text-blue-400">
-                  Dashboard
-                </Button>
+                <Button variant="ghost">Dashboard</Button>
               </Link>
 
               <Button variant="ghost" onClick={handleLogout}>
@@ -121,9 +95,7 @@ export const Navbar = () => {
           ) : (
             <>
               <Link to="/login">
-                <Button variant="ghost" className="text-blue-400">
-                  Login
-                </Button>
+                <Button variant="ghost">Login</Button>
               </Link>
 
               <Link to="/register">
@@ -134,7 +106,7 @@ export const Navbar = () => {
         </div>
 
         {/* MOBILE BUTTON */}
-        <div className="md:hidden flex items-center gap-3">
+        <div className="md:hidden flex items-center gap-2">
           <Button variant="ghost" size="icon" onClick={toggleDarkMode}>
             {isDark ? <Sun /> : <Moon />}
           </Button>
@@ -151,10 +123,7 @@ export const Navbar = () => {
 
       {/* MOBILE MENU */}
       {isMobileMenuOpen && (
-        <div
-          className="md:hidden backdrop-blur-2xl bg-black/80 
-        border-t border-white/10 px-6 py-6 space-y-4"
-        >
+        <div className="md:hidden backdrop-blur-xl bg-black/90 border-t border-white/10 px-5 py-5 space-y-4">
           <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
             Home
           </Link>
@@ -172,12 +141,18 @@ export const Navbar = () => {
 
           {user ? (
             <>
-              <Link to="/dashboard">Dashboard</Link>
-              <Button onClick={handleLogout}>Logout</Button>
+              <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                Dashboard
+              </Link>
+
+              <Button onClick={handleLogout} className="w-full">
+                Logout
+              </Button>
             </>
           ) : (
             <>
               <Link to="/login">Login</Link>
+
               <Link to="/register">
                 <Button className="w-full">Get Started</Button>
               </Link>

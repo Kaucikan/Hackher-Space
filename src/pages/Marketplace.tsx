@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 
 /* -------------------- TYPES -------------------- */
+
 type Listing = {
   _id: string;
   title?: string;
@@ -19,10 +20,13 @@ type Listing = {
   status?: string;
 };
 
-const API_URL = "https://hackher-space-be.onrender.com/api";
+const API_URL =
+  import.meta.env.VITE_API || "https://hackher-space-be.onrender.com/api";
+
 const categories = ["All", "Metal", "Energy", "Chemical", "Plastic", "Wood"];
 
 /* -------------------- COMPONENT -------------------- */
+
 export const Marketplace = () => {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
@@ -30,6 +34,7 @@ export const Marketplace = () => {
   const [loading, setLoading] = useState(true);
 
   /* -------------------- FETCH -------------------- */
+
   useEffect(() => {
     fetch(`${API_URL}/listings`)
       .then((res) => res.json())
@@ -39,10 +44,10 @@ export const Marketplace = () => {
   }, []);
 
   /* -------------------- FILTER -------------------- */
+
   const filteredListings = useMemo(() => {
     return listings.filter((item) => {
       const text = search.toLowerCase();
-
       const title = item.title || item.name || "";
 
       return (
@@ -55,6 +60,7 @@ export const Marketplace = () => {
   }, [search, activeCategory, listings]);
 
   /* -------------------- REQUEST -------------------- */
+
   const sendRequest = async (id: string) => {
     try {
       const user = JSON.parse(localStorage.getItem("user") || "{}");
@@ -87,8 +93,9 @@ export const Marketplace = () => {
   };
 
   /* -------------------- UI -------------------- */
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* HEADER */}
       <div>
         <h1 className="text-2xl font-semibold">Marketplace</h1>
@@ -106,12 +113,12 @@ export const Marketplace = () => {
       />
 
       {/* CATEGORY */}
-      <div className="flex gap-2 overflow-x-auto">
+      <div className="flex gap-2 overflow-x-auto pb-1">
         {categories.map((cat) => (
           <button
             key={cat}
             onClick={() => setActiveCategory(cat)}
-            className={`px-3 py-1 text-sm rounded-md border ${
+            className={`px-3 py-1 text-sm rounded-md border whitespace-nowrap ${
               activeCategory === cat
                 ? "bg-primary text-white border-primary"
                 : "bg-white border-border"
@@ -123,12 +130,13 @@ export const Marketplace = () => {
       </div>
 
       {/* STATES */}
+
       {loading ? (
         <p className="text-sm text-muted text-center">Loading listings...</p>
       ) : filteredListings.length === 0 ? (
         <p className="text-sm text-muted text-center">No listings available</p>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredListings.map((item) => {
             const title = item.title || item.name || "Material";
 
@@ -166,20 +174,31 @@ export const Marketplace = () => {
                   </p>
 
                   <p className="text-sm font-medium text-primary">
-                    {(item as any).quantityLabel || `${item.quantity} kg`}
+                    {`${item.quantity} kg`}
                   </p>
+
+                  {/* PHONE */}
+                  {item.phone && (
+                    <p className="text-sm flex items-center text-muted">
+                      <Phone size={14} className="mr-1" />
+                      {item.phone}
+                    </p>
+                  )}
 
                   {/* ACTIONS */}
                   <div className="flex gap-2 pt-2">
-                    <a href={`tel:${item.phone || ""}`} className="flex-1">
-                      <Button className="w-full">
-                        <Phone size={14} className="mr-1" />
-                        Call
-                      </Button>
-                    </a>
+                    {item.phone && (
+                      <a href={`tel:${item.phone}`} className="flex-1">
+                        <Button className="w-full">
+                          <Phone size={14} className="mr-1" />
+                          Call
+                        </Button>
+                      </a>
+                    )}
 
                     <Button
                       variant="outline"
+                      className="flex-1"
                       onClick={() => sendRequest(item._id)}
                     >
                       Request

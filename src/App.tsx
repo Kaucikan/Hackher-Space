@@ -21,11 +21,14 @@ import { MyListings } from "./pages/MyListings";
 import CarbonCalculator from "./pages/CarbonCalculator";
 import { DigitalTwin } from "./pages/DigitalTwin";
 
-import { Bell, Search, User } from "lucide-react";
+import { Bell, User } from "lucide-react";
 import { Button } from "./components/ui/Button";
 
-/* -------------------- AUTH -------------------- */
+/* -------------------- CONFIG -------------------- */
 
+const API = import.meta.env.VITE_API || "https://hackher-space-be.onrender.com";
+
+/* -------------------- AUTH -------------------- */
 
 const getUser = () => {
   try {
@@ -35,9 +38,6 @@ const getUser = () => {
     return null;
   }
 };
-
-const API = "https://hackher-space-be.onrender.com";
-/* -------------------- ROUTES -------------------- */
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const user = getUser();
@@ -49,12 +49,13 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   return user?.id ? <Navigate to="/dashboard" replace /> : children;
 };
 
-/* -------------------- LAYOUT -------------------- */
+/* -------------------- DASHBOARD LAYOUT -------------------- */
 
 const DashboardLayout = () => {
   const [user, setUser] = useState<any>(null);
   const [open, setOpen] = useState(false);
   const [edit, setEdit] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -77,33 +78,27 @@ const DashboardLayout = () => {
 
   const saveProfile = async () => {
     try {
-      const res = await fetch(
-        `${API}/api/auth/update-profile/${user.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: form.name,
-            email: form.email,
-            phone: form.phone,
-          }),
+      setLoading(true);
+
+      const res = await fetch(`${API}/api/auth/update-profile/${user.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify(form),
+      });
 
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.error);
 
-      // update local storage
       localStorage.setItem("user", JSON.stringify(data));
-
-      // update UI
       setUser(data);
       setEdit(false);
     } catch (err) {
       console.error("Profile update failed:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -111,15 +106,14 @@ const DashboardLayout = () => {
     <div className="flex min-h-screen bg-background">
       <Sidebar />
 
-      <main className="flex-1 ml-20 md:ml-64">
+      <main className="flex-1 ml-0 md:ml-64">
         {/* HEADER */}
-        <header className="h-16 bg-white border-b flex items-center justify-between px-6 sticky top-0 z-30">
-          <div className="flex items-center gap-4">
+        <header className="h-16 bg-white border-b flex items-center justify-between px-4 md:px-6 sticky top-0 z-30">
+          <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon">
               <Bell className="w-5 h-5 text-muted" />
             </Button>
 
-            {/* PROFILE */}
             <div
               onClick={() => setOpen(true)}
               className="flex items-center gap-3 cursor-pointer hover:bg-slate-100 px-3 py-1 rounded-lg"
@@ -138,15 +132,15 @@ const DashboardLayout = () => {
           </div>
         </header>
 
-        <div className="p-6">
+        <div className="p-4 md:p-6">
           <Outlet />
         </div>
       </main>
 
       {/* PROFILE MODAL */}
       {open && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl w-[380px]">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4">
+          <div className="bg-white p-6 rounded-xl w-full max-w-md">
             <h2 className="text-lg font-semibold mb-4">Profile</h2>
 
             {!edit ? (
@@ -170,7 +164,7 @@ const DashboardLayout = () => {
 
                 <div className="flex gap-2">
                   <Button className="flex-1" onClick={() => setEdit(true)}>
-                    Edit Profile
+                    Edit
                   </Button>
 
                   <Button
@@ -206,8 +200,12 @@ const DashboardLayout = () => {
                 />
 
                 <div className="flex gap-2">
-                  <Button className="flex-1" onClick={saveProfile}>
-                    Save
+                  <Button
+                    className="flex-1"
+                    onClick={saveProfile}
+                    disabled={loading}
+                  >
+                    {loading ? "Saving..." : "Save"}
                   </Button>
 
                   <Button
@@ -289,4 +287,3 @@ export default function App() {
     </Router>
   );
 }
-

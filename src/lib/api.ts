@@ -10,30 +10,34 @@ export const getUser = () => {
   }
 };
 
+const API = import.meta.env.VITE_API || "https://hackher-space-be.onrender.com";
+
 export const apiFetch = async (
-  url: string,
+  path: string,
   options: RequestInit = {},
   requireUser = false,
 ) => {
   const user = getUser();
 
-  // 🔥 if API needs userId
   if (requireUser && !user?.id) {
     throw new Error("User not logged in");
   }
 
-  // 🔥 attach userId automatically
-  let finalUrl = url;
-  if (user?.id) {
-    const separator = url.includes("?") ? "&" : "?";
-    finalUrl = `${url}${separator}userId=${user.id}`;
+  let url = `${API}${path}`;
+
+  // attach userId only if required
+  if (requireUser && user?.id) {
+    const sep = url.includes("?") ? "&" : "?";
+    url = `${url}${sep}userId=${user.id}`;
   }
 
-  return fetch(finalUrl, {
+  const res = await fetch(url, {
     ...options,
     headers: {
       "Content-Type": "application/json",
-      ...options.headers,
+      ...(options.headers || {}),
     },
   });
+
+  return res;
 };

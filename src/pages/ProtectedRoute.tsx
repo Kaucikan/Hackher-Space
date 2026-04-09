@@ -1,9 +1,20 @@
 import { Navigate } from "react-router-dom";
 import { getUser } from "@/lib/utils";
-export const ProtectedRoute = ({ children }: any) => {
-  const user = getUser();
+import { useEffect, useState } from "react";
 
-  if (!user) {
+export const ProtectedRoute = ({ children }: any) => {
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const u = getUser();
+    setUser(u);
+    setLoading(false);
+  }, []);
+
+  if (loading) return null;
+
+  if (!user?.id) {
     return <Navigate to="/login" replace />;
   }
 

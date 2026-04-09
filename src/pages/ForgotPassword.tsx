@@ -4,6 +4,8 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 
+const API = import.meta.env.VITE_API || "https://hackher-space-be.onrender.com";
+
 export const ForgotPassword = () => {
   const [step, setStep] = useState(1);
 
@@ -13,31 +15,30 @@ export const ForgotPassword = () => {
 
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
+
   const navigate = useNavigate();
 
   /* SEND OTP */
   const sendOtp = async () => {
+    if (!email) return setMsg("Enter email");
+
     setLoading(true);
     setMsg("");
 
     try {
-      const res = await fetch(
-        "https://hackher-space-be.onrender.com/api/auth/forgot-password",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        },
-      );
+      const res = await fetch(`${API}/api/auth/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
 
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.error);
 
       setStep(2);
       setMsg("OTP sent to your email");
     } catch (err: any) {
-      setMsg(err.message);
+      setMsg(err.message || "Failed to send OTP");
     }
 
     setLoading(false);
@@ -45,24 +46,25 @@ export const ForgotPassword = () => {
 
   /* VERIFY OTP */
   const verifyOtp = async () => {
+    if (!otp) return setMsg("Enter OTP");
+
     setLoading(true);
     setMsg("");
 
     try {
-      const res = await fetch("https://hackher-space-be.onrender.com/api/auth/verify-otp", {
+      const res = await fetch(`${API}/api/auth/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),
       });
 
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.error);
 
       setStep(3);
       setMsg("OTP verified");
     } catch (err: any) {
-      setMsg(err.message);
+      setMsg(err.message || "Invalid OTP");
     }
 
     setLoading(false);
@@ -70,35 +72,36 @@ export const ForgotPassword = () => {
 
   /* RESET PASSWORD */
   const resetPassword = async () => {
+    if (!password) return setMsg("Enter new password");
+
     setLoading(true);
     setMsg("");
 
     try {
-      const res = await fetch("https://hackher-space-be.onrender.com/api/auth/reset-password", {
+      const res = await fetch(`${API}/api/auth/reset-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.error);
 
-      setMsg("Password updated. Redirecting to login...");
+      setMsg("Password updated. Redirecting...");
 
       setTimeout(() => {
         navigate("/login");
       }, 1500);
     } catch (err: any) {
-      setMsg(err.message);
+      setMsg(err.message || "Reset failed");
     }
 
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <Card className="p-6 w-[350px] space-y-4">
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <Card className="p-6 w-full max-w-md space-y-4">
         <h2 className="text-lg font-semibold text-center">Forgot Password</h2>
 
         {step === 1 && (

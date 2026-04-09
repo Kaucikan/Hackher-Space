@@ -7,6 +7,10 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 
+/* API */
+
+const API = import.meta.env.VITE_API || "https://hackher-space-be.onrender.com";
+
 export const AuthPage = ({ type }: { type: "login" | "register" }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -20,7 +24,7 @@ export const AuthPage = ({ type }: { type: "login" | "register" }) => {
 
   const navigate = useNavigate();
 
-  /* -------------------- HANDLERS -------------------- */
+  /* HANDLERS */
 
   const handleChange = (key: string, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -28,9 +32,12 @@ export const AuthPage = ({ type }: { type: "login" | "register" }) => {
 
   const validate = () => {
     if (!form.email.includes("@")) return "Enter a valid email address";
+
     if (form.password.length < 6)
       return "Password must be at least 6 characters";
+
     if (type === "register" && !form.name) return "Name is required";
+
     return "";
   };
 
@@ -48,9 +55,7 @@ export const AuthPage = ({ type }: { type: "login" | "register" }) => {
 
     try {
       const url =
-        type === "login"
-          ? "https://hackher-space-be.onrender.com/api/auth/login"
-          : "https://hackher-space-be.onrender.com/api/auth/register";
+        type === "login" ? `${API}/api/auth/login` : `${API}/api/auth/register`;
 
       const res = await fetch(url, {
         method: "POST",
@@ -63,57 +68,46 @@ export const AuthPage = ({ type }: { type: "login" | "register" }) => {
       });
 
       const data = await res.json();
-      console.log("API RESPONSE:", data);
 
       if (!res.ok) {
         throw new Error(data.error || data.message || "Authentication failed");
       }
 
-      /* -------------------- SAFE USER EXTRACTION -------------------- */
+      /* USER EXTRACTION */
 
-      let userId: string | null = null;
-      let userName: string = "User";
+      const user = data.user ||
+        data.data || {
+          id: data.id,
+          name: data.name,
+          email: data.email,
+        };
 
-      if (data?.user) {
-        userId = data.user.id || data.user._id;
-        userName = data.user.name;
-      } else if (data?.data) {
-        userId = data.data.id || data.data._id;
-        userName = data.data.name;
-      } else {
-        userId = data.id || data._id;
-        userName = data.name;
-      }
+      const userId = user.id || user._id;
 
-      if (!userId) {
-        console.error("INVALID BACKEND RESPONSE:", data);
-        throw new Error("Server did not return user ID");
-      }
+      if (!userId) throw new Error("Invalid server response");
 
-      /* -------------------- STORE USER -------------------- */
+      /* STORE USER */
 
       localStorage.setItem(
         "user",
         JSON.stringify({
           id: userId,
-          name: userName || "User",
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
         }),
       );
 
-      /* -------------------- REDIRECT -------------------- */
-
       navigate("/dashboard");
     } catch (err: any) {
-      console.error(err);
       setError(err.message || "Authentication failed");
     } finally {
       setIsLoading(false);
     }
   };
-  /* -------------------- UI -------------------- */
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 bg-background relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 bg-background relative overflow-hidden">
       {/* BACKGROUND */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute -top-24 -left-24 w-80 h-80 bg-primary/10 rounded-full blur-3xl" />
@@ -126,17 +120,18 @@ export const AuthPage = ({ type }: { type: "login" | "register" }) => {
         className="w-full max-w-md"
       >
         {/* HEADER */}
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 mb-4">
+        <div className="text-center mb-6">
+          <Link to="/" className="inline-flex items-center gap-2 mb-3">
             <div className="bg-primary p-2 rounded-lg">
               <Leaf className="text-white w-5 h-5" />
             </div>
+
             <span className="text-xl font-semibold">
               Waste<span className="text-primary">Exchange</span>
             </span>
           </Link>
 
-          <h2 className="text-xl font-semibold">
+          <h2 className="text-lg sm:text-xl font-semibold">
             {type === "login" ? "Welcome back" : "Create an account"}
           </h2>
 
@@ -148,7 +143,7 @@ export const AuthPage = ({ type }: { type: "login" | "register" }) => {
         </div>
 
         {/* FORM */}
-        <Card className="p-6 border border-border shadow-sm">
+        <Card className="p-5 sm:p-6 border border-border shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-4">
             {type === "register" && (
               <Input
@@ -186,14 +181,12 @@ export const AuthPage = ({ type }: { type: "login" | "register" }) => {
               </button>
             </div>
 
-            {/* ERROR */}
             {error && (
               <div className="text-sm text-red-600 bg-red-50 border border-red-200 p-2 rounded-md text-center">
                 {error}
               </div>
             )}
 
-            {/* BUTTON */}
             <Button className="w-full h-11">
               {isLoading
                 ? "Processing..."
@@ -205,7 +198,7 @@ export const AuthPage = ({ type }: { type: "login" | "register" }) => {
         </Card>
 
         {/* FOOTER */}
-        <div className="text-center text-sm mt-6 text-muted space-y-1">
+        <div className="text-center text-sm mt-5 text-muted space-y-1">
           {type === "login" ? (
             <>
               <Link to="/forgot-password" className="text-primary block">

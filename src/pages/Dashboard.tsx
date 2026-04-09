@@ -9,6 +9,7 @@ import {
   AreaChart,
   Area,
 } from "recharts";
+
 import { getUser } from "@/lib/utils";
 import {
   TrendingUp,
@@ -20,6 +21,10 @@ import {
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+
+/* -------------------- CONFIG -------------------- */
+
+const API = import.meta.env.VITE_API || "https://hackher-space-be.onrender.com";
 
 /* -------------------- TYPES -------------------- */
 
@@ -50,35 +55,35 @@ export const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  /* -------------------- LOAD USER -------------------- */
+  /* LOAD USER */
 
+  useEffect(() => {
+    const u = getUser();
 
-useEffect(() => {
-  const user = getUser();
+    if (!u) {
+      setError("User not logged in");
+      setLoading(false);
+      return;
+    }
 
-  if (!user) {
-    setError("User not logged in");
-    setLoading(false);
-    return;
-  }
+    setUser(u);
+  }, []);
 
-  setUser(user);
-}, []);
+  /* FETCH DATA */
 
-  /* -------------------- FETCH DATA -------------------- */
   useEffect(() => {
     if (!user?.id) return;
 
     const fetchData = async () => {
       try {
         const [carbonRes, impactRes, statsRes] = await Promise.all([
-          fetch("https://hackher-space-be.onrender.com/api/carbon", {
+          fetch(`${API}/api/carbon`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ type: "individual" }),
           }),
-          fetch(`https://hackher-space-be.onrender.com/api/impact/${user.id}`),
-          fetch(`https://hackher-space-be.onrender.com/api/stats/${user.id}`),
+          fetch(`${API}/api/impact/${user.id}`),
+          fetch(`${API}/api/stats/${user.id}`),
         ]);
 
         const carbonData = await carbonRes.json();
@@ -93,8 +98,7 @@ useEffect(() => {
           wasteReused: statsData?.wasteReused || 0,
           earnings: statsData?.earnings || 0,
         });
-      } catch (err) {
-        console.error(err);
+      } catch {
         setError("Failed to load dashboard data");
       } finally {
         setLoading(false);
@@ -104,24 +108,22 @@ useEffect(() => {
     fetchData();
   }, [user]);
 
-  /* -------------------- STATES -------------------- */
+  /* STATES */
 
-  if (loading) {
+  if (loading)
     return (
       <div className="text-center mt-10 text-muted">Loading dashboard...</div>
     );
-  }
 
-  if (error) {
+  if (error)
     return <div className="text-center mt-10 text-red-600">{error}</div>;
-  }
 
-  /* -------------------- UI -------------------- */
+  /* UI */
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* HEADER */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
         <div>
           <h1 className="text-2xl font-semibold">Dashboard</h1>
           <p className="text-sm text-muted">
@@ -129,7 +131,7 @@ useEffect(() => {
           </p>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Link to="/dashboard/carbon">
             <Button variant="outline">Carbon</Button>
           </Link>
@@ -148,7 +150,7 @@ useEffect(() => {
       </div>
 
       {/* STATS */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <StatCard
           title="Waste Listed"
           value={`${stats.wasteListed} kg`}
@@ -170,7 +172,7 @@ useEffect(() => {
         />
       </div>
 
-      {/* GRID SECTION */}
+      {/* GRID */}
       <div className="grid lg:grid-cols-3 gap-6">
         {/* CHART */}
         <Card className="lg:col-span-2">
@@ -178,7 +180,7 @@ useEffect(() => {
             <CardTitle>Impact Overview</CardTitle>
           </CardHeader>
 
-          <CardContent className="h-[300px]">
+          <CardContent className="h-[280px] md:h-[320px]">
             <ResponsiveContainer>
               <AreaChart data={impactData}>
                 <CartesianGrid stroke="#e2e8f0" vertical={false} />
@@ -206,7 +208,7 @@ useEffect(() => {
           </CardContent>
         </Card>
 
-        {/* DIGITAL TWIN CARD */}
+        {/* SIMULATION */}
         <Card>
           <CardHeader>
             <CardTitle>Simulation</CardTitle>
@@ -227,7 +229,7 @@ useEffect(() => {
   );
 };
 
-/* -------------------- STAT CARD -------------------- */
+/* STAT CARD */
 
 const StatCard = ({
   title,
@@ -238,11 +240,11 @@ const StatCard = ({
   value: string;
   icon: React.ReactNode;
 }) => (
-  <Card className="p-5 border border-border hover:shadow-sm transition">
+  <Card className="p-4 md:p-5 border border-border hover:shadow-sm transition">
     <div className="flex justify-between items-start">
       <div>
         <p className="text-xs text-muted">{title}</p>
-        <h2 className="text-xl font-semibold mt-1">{value}</h2>
+        <h2 className="text-lg md:text-xl font-semibold mt-1">{value}</h2>
       </div>
 
       <div className="text-primary">{icon}</div>

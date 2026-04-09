@@ -37,46 +37,47 @@ export default function CarbonCalculator() {
 
   /* -------------------- CALCULATE -------------------- */
 
-  const calculate = async () => {
-    try {
-      setLoading(true);
-      setError("");
+ const calculate = async () => {
+   try {
+     setLoading(true);
+     setError("");
 
-      const res = await fetch("https://hackher-space-be.onrender.com/api/carbon", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...form,
-          type,
-        }),
-      });
+     const res = await fetch(
+       "https://hackher-space-be.onrender.com/api/carbon",
+       {
+         method: "POST",
+         headers: {
+           "Content-Type": "application/json",
+         },
+         body: JSON.stringify({
+           ...form,
+           type,
+         }),
+       },
+     );
 
-      if (!res.ok) throw new Error();
+     const data = await res.json();
+     setResult(data);
 
-      const data: CarbonResult = await res.json();
-      setResult(data);
-
-      /* SAVE TO DIGITAL TWIN */
-      await fetch("https://hackher-space-be.onrender.com/api/digital-twin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          material: "Carbon Emission",
-          quantity: Number(data.total_carbon),
-          location: type,
-          status: data.suggestion,
-        }),
-      });
-    } catch {
-      setError("Failed to calculate carbon footprint");
-    } finally {
-      setLoading(false);
-    }
-  };
+     /* SAVE TO MONGODB DIGITAL TWIN */
+     await fetch("https://hackher-space-be.onrender.com/api/digital-twin", {
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json",
+       },
+       body: JSON.stringify({
+         material: "Carbon Emission",
+         quantity: Number(data.total_carbon),
+         location: type,
+         status: data.suggestion,
+       }),
+     });
+   } catch {
+     setError("Failed to calculate carbon footprint");
+   } finally {
+     setLoading(false);
+   }
+ };
 
   const reset = () => {
     setForm({

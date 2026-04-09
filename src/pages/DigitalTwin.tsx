@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 
+const API = import.meta.env.VITE_API || "https://hackher-space-be.onrender.com";
+
 type TwinData = {
   _id: string;
   material: string;
@@ -25,10 +27,18 @@ export const DigitalTwin = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch("https://hackher-space-be.onrender.com/api/digital-twin");
+        const res = await fetch(`${API}/api/digital-twin`);
+
+        if (!res.ok) {
+          console.error("Twin API failed:", res.status);
+          setData([]);
+          return;
+        }
+
         const result = await res.json();
-        setData(result || []);
-      } catch {
+        setData(Array.isArray(result) ? result : []);
+      } catch (err) {
+        console.error("Twin fetch error:", err);
         setData([]);
       } finally {
         setLoading(false);
@@ -55,7 +65,6 @@ export const DigitalTwin = () => {
 
   return (
     <div className="space-y-8">
-      {/* HEADER */}
       <div>
         <h1 className="text-2xl font-semibold">Digital Twin Simulation</h1>
 
@@ -92,7 +101,6 @@ export const DigitalTwin = () => {
         </Card>
       )}
 
-      {/* LOADING */}
       {loading && <p className="text-sm text-muted">Loading simulation...</p>}
 
       {/* GRID */}
