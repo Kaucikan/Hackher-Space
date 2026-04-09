@@ -49,8 +49,8 @@ export const AuthPage = ({ type }: { type: "login" | "register" }) => {
     try {
       const url =
         type === "login"
-          ? "http://localhost:5000/api/auth/login"
-          : "http://localhost:5000/api/auth/register";
+          ? "https://hackher-space-be.onrender.com/api/auth/login"
+          : "https://hackher-space-be.onrender.com/api/auth/register";
 
       const res = await fetch(url, {
         method: "POST",
