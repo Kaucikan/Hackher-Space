@@ -36,6 +36,7 @@ const getUser = () => {
   }
 };
 
+const API = "https://hackher-space-be.onrender.com";
 /* -------------------- ROUTES -------------------- */
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -77,7 +78,7 @@ const DashboardLayout = () => {
   const saveProfile = async () => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/auth/update-profile/${user.id}`,
+        `${API}/api/auth/update-profile/${user.id}`,
         {
           method: "PUT",
           headers: {
