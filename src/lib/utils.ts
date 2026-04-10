@@ -1,7 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-/* -------------------- TAILWIND MERGE -------------------- */
+/* -------------------- CN (TAILWIND MERGE) -------------------- */
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -14,12 +14,15 @@ export type User = {
   name?: string;
   email?: string;
   phone?: string;
+  token?: string;
 };
 
 /* -------------------- GET USER -------------------- */
 
 export const getUser = (): User | null => {
   try {
+    if (typeof window === "undefined") return null;
+
     const data = localStorage.getItem("user");
     if (!data) return null;
 
@@ -38,19 +41,31 @@ export const getUser = (): User | null => {
 /* -------------------- SET USER -------------------- */
 
 export const setUser = (user: User) => {
+  if (typeof window === "undefined") return;
   localStorage.setItem("user", JSON.stringify(user));
 };
 
 /* -------------------- LOGOUT -------------------- */
 
 export const logout = () => {
+  if (typeof window === "undefined") return;
+
   localStorage.removeItem("user");
-  window.location.href = "/login";
+
+  // soft redirect
+  window.location.replace("/login");
 };
 
-/* -------------------- IS AUTH -------------------- */
+/* -------------------- IS AUTHENTICATED -------------------- */
 
 export const isAuthenticated = () => {
   const user = getUser();
-  return !!user?.id;
+  return Boolean(user?.id);
+};
+
+/* -------------------- GET USER ID -------------------- */
+
+export const getUserId = () => {
+  const user = getUser();
+  return user?.id || null;
 };

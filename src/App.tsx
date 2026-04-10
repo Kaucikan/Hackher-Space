@@ -7,6 +7,8 @@ import {
   Outlet,
 } from "react-router-dom";
 
+import { useTranslation } from "react-i18next";
+
 import { Navbar } from "./components/Navbar";
 import { Sidebar } from "./components/Sidebar";
 import { ForgotPassword } from "./pages/ForgotPassword";
@@ -23,6 +25,7 @@ import { DigitalTwin } from "./pages/DigitalTwin";
 
 import { Bell, User } from "lucide-react";
 import { Button } from "./components/ui/Button";
+import AIChatbot from "./components/AIChatbot";
 
 /* -------------------- CONFIG -------------------- */
 
@@ -89,14 +92,13 @@ const DashboardLayout = () => {
       });
 
       const data = await res.json();
-
       if (!res.ok) throw new Error(data.error);
 
       localStorage.setItem("user", JSON.stringify(data));
       setUser(data);
       setEdit(false);
     } catch (err) {
-      console.error("Profile update failed:", err);
+      console.error("Profile Update Failed:", err);
     } finally {
       setLoading(false);
     }
@@ -106,9 +108,9 @@ const DashboardLayout = () => {
     <div className="flex min-h-screen bg-background">
       <Sidebar />
 
-      <main className="flex-1 ml-0 md:ml-64">
+      <main className="flex-1 md:ml-64 pt-14 md:pt-0">
         {/* HEADER */}
-        <header className="h-16 bg-white border-b flex items-center justify-between px-4 md:px-6 sticky top-0 z-30">
+        <header className="h-14 md:h-16 bg-white border-b flex items-center justify-between px-3 md:px-6 sticky top-0 z-30">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon">
               <Bell className="w-5 h-5 text-muted" />
@@ -121,7 +123,7 @@ const DashboardLayout = () => {
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-medium">{user?.name || "User"}</p>
                 <p className="text-xs text-muted">
-                  {user?.phone || "Add phone"}
+                  {user?.phone || "Add Phone"}
                 </p>
               </div>
 
@@ -132,6 +134,7 @@ const DashboardLayout = () => {
           </div>
         </header>
 
+        {/* CONTENT */}
         <div className="p-4 md:p-6">
           <Outlet />
         </div>
@@ -140,7 +143,7 @@ const DashboardLayout = () => {
       {/* PROFILE MODAL */}
       {open && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4">
-          <div className="bg-white p-6 rounded-xl w-full max-w-md">
+          <div className="bg-white p-5 md:p-6 rounded-xl w-full max-w-md">
             <h2 className="text-lg font-semibold mb-4">Profile</h2>
 
             {!edit ? (
@@ -158,13 +161,13 @@ const DashboardLayout = () => {
 
                   <div>
                     <p className="text-xs text-muted">Phone</p>
-                    <p className="font-medium">{user?.phone || "Not added"}</p>
+                    <p className="font-medium">{user?.phone || "Not Added"}</p>
                   </div>
                 </div>
 
                 <div className="flex gap-2">
                   <Button className="flex-1" onClick={() => setEdit(true)}>
-                    Edit
+                    Edit Profile
                   </Button>
 
                   <Button
@@ -181,21 +184,21 @@ const DashboardLayout = () => {
                 <input
                   className="w-full mb-3 p-2 border rounded-md"
                   value={form.name}
-                  placeholder="Name"
+                  placeholder="Full Name"
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                 />
 
                 <input
                   className="w-full mb-3 p-2 border rounded-md"
                   value={form.phone}
-                  placeholder="Phone"
+                  placeholder="Phone Number"
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
                 />
 
                 <input
                   className="w-full mb-4 p-2 border rounded-md"
                   value={form.email}
-                  placeholder="Email"
+                  placeholder="Email Address"
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                 />
 
@@ -205,7 +208,7 @@ const DashboardLayout = () => {
                     onClick={saveProfile}
                     disabled={loading}
                   >
-                    {loading ? "Saving..." : "Save"}
+                    {loading ? "Saving..." : "Save Changes"}
                   </Button>
 
                   <Button
@@ -228,10 +231,28 @@ const DashboardLayout = () => {
 /* -------------------- APP -------------------- */
 
 export default function App() {
+  const { i18n } = useTranslation();
+
   return (
     <Router>
+      {/* LANGUAGE SWITCH */}
+      <div className="fixed top-4 right-4 z-[100] hidden md:flex gap-2">
+        <button
+          className="px-3 py-1 bg-white border rounded"
+          onClick={() => i18n.changeLanguage("en")}
+        >
+          EN
+        </button>
+
+        <button
+          className="px-3 py-1 bg-white border rounded"
+          onClick={() => i18n.changeLanguage("ta")}
+        >
+          தமிழ்
+        </button>
+      </div>
+
       <Routes>
-        {/* LANDING */}
         <Route
           path="/"
           element={
@@ -242,7 +263,6 @@ export default function App() {
           }
         />
 
-        {/* AUTH */}
         <Route
           path="/login"
           element={
@@ -261,9 +281,15 @@ export default function App() {
           }
         />
 
-        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route
+          path="/forgot-password"
+          element={
+            <PublicRoute>
+              <ForgotPassword />
+            </PublicRoute>
+          }
+        />
 
-        {/* DASHBOARD */}
         <Route
           path="/dashboard"
           element={
@@ -281,9 +307,11 @@ export default function App() {
           <Route path="messages" element={<Messages />} />
         </Route>
 
-        {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+
+      {/* GLOBAL AI CHATBOT */}
+      <AIChatbot />
     </Router>
   );
 }

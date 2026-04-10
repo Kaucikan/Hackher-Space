@@ -20,24 +20,42 @@ export const apiFetch = async (
   const user = getUser();
 
   if (requireUser && !user?.id) {
-    throw new Error("User not logged in");
+    throw new Error("User Not Logged In");
   }
 
   let url = `${API}${path}`;
 
-  // attach userId only if required
+  // attach userId to query
   if (requireUser && user?.id) {
     const sep = url.includes("?") ? "&" : "?";
     url = `${url}${sep}userId=${user.id}`;
   }
 
-  const res = await fetch(url, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {}),
-    },
-  });
+  try {
+    const res = await fetch(url, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {}),
+      },
+    });
 
-  return res;
+    // auto logout if unauthorized
+    if (res.status === 401) {
+      localStorage.removeItem("user");
+      window.location.href = "/login";
+      return;
+    }
+
+    // handle server error
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || "API Error");
+    }
+
+    return res;
+  } catch (err) {
+    console.error("API Fetch Error:", err);
+    throw err;
+  }
 };

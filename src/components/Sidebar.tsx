@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 /* MENU */
 
@@ -24,7 +25,7 @@ const menuItems = [
   { icon: ShoppingBag, label: "Marketplace", path: "/dashboard/marketplace" },
   { icon: PlusCircle, label: "Add Waste", path: "/dashboard/add" },
   { icon: History, label: "My Listings", path: "/dashboard/listings" },
-  { icon: Globe, label: "Carbon", path: "/dashboard/carbon" },
+  { icon: Globe, label: "Carbon Tracker", path: "/dashboard/carbon" },
   { icon: Cpu, label: "Digital Twin", path: "/dashboard/digital-twin" },
   { icon: MessageSquare, label: "Messages", path: "/dashboard/messages" },
 ];
@@ -74,11 +75,12 @@ export const Sidebar = () => {
       {/* SIDEBAR */}
       <aside
         className={cn(
-          "fixed left-0 top-0 h-screen w-64 z-50 flex flex-col",
+          "fixed left-0 top-0 h-screen z-50 flex flex-col",
+          "w-[85%] max-w-[280px] md:w-64",
           "bg-white border-r border-slate-200 shadow-sm",
           "transition-transform duration-200",
           open ? "translate-x-0" : "-translate-x-full",
-          "md:translate-x-0",
+          "md:translate-x-0"
         )}
       >
         {/* HEADER */}
@@ -107,10 +109,9 @@ export const Sidebar = () => {
         )}
 
         {/* MENU */}
-        <nav className="flex-1 px-3 space-y-1">
+        <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
           {menuItems.map((item) => {
             const isActive = location.pathname === item.path;
-
             const Icon = item.icon;
 
             return (
@@ -119,14 +120,14 @@ export const Sidebar = () => {
                 to={item.path}
                 onClick={() => setOpen(false)}
                 className={cn(
-                  "flex items-center px-3 py-3 rounded-xl transition",
+                  "flex items-center px-3 py-3 rounded-xl transition text-sm md:text-base",
                   isActive
                     ? "bg-primary/10 text-primary font-medium"
-                    : "text-slate-600 hover:bg-slate-100",
+                    : "text-slate-600 hover:bg-slate-100"
                 )}
               >
                 <Icon className="w-5 h-5" />
-                <span className="ml-3 text-sm">{item.label}</span>
+                <span className="ml-3">{item.label}</span>
               </Link>
             );
           })}
@@ -136,7 +137,9 @@ export const Sidebar = () => {
         <div className="p-3 border-t space-y-2">
           <button className="w-full flex items-center px-3 py-3 rounded-xl hover:bg-slate-100">
             <Settings className="w-5 h-5" />
-            <span className="ml-3 text-sm">Settings</span>
+            <span className="ml-3 text-sm md:text-base">
+              Settings
+            </span>
           </button>
 
           <button
@@ -144,7 +147,9 @@ export const Sidebar = () => {
             className="w-full flex items-center px-3 py-3 rounded-xl text-red-500 hover:bg-red-50"
           >
             <LogOut className="w-5 h-5" />
-            <span className="ml-3 text-sm">Logout</span>
+            <span className="ml-3 text-sm md:text-base">
+              Logout
+            </span>
           </button>
         </div>
       </aside>

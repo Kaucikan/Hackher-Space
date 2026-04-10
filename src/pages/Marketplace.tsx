@@ -1,18 +1,17 @@
 import { useState, useMemo, useEffect } from "react";
-import { Search, MapPin, MessageCircle, Info, Phone } from "lucide-react";
+import { Search, MapPin, MessageCircle, Phone } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 
-/* -------------------- TYPES -------------------- */
-
 type Listing = {
   _id: string;
   title?: string;
   name?: string;
-  category: string;
+  category?: string;
   quantity: string;
   location: string;
   images: string[];
@@ -25,25 +24,21 @@ const API_URL =
 
 const categories = ["All", "Metal", "Energy", "Chemical", "Plastic", "Wood"];
 
-/* -------------------- COMPONENT -------------------- */
-
 export const Marketplace = () => {
+  const { t } = useTranslation();
+
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
 
-  /* -------------------- FETCH -------------------- */
-
   useEffect(() => {
-    fetch(`${API_URL}/listings`)
+    fetch(`${API}/api/listings`)
       .then((res) => res.json())
       .then((data) => setListings(data || []))
       .catch(() => setListings([]))
       .finally(() => setLoading(false));
   }, []);
-
-  /* -------------------- FILTER -------------------- */
 
   const filteredListings = useMemo(() => {
     return listings.filter((item) => {
@@ -59,14 +54,12 @@ export const Marketplace = () => {
     });
   }, [search, activeCategory, listings]);
 
-  /* -------------------- REQUEST -------------------- */
-
   const sendRequest = async (id: string) => {
     try {
       const user = JSON.parse(localStorage.getItem("user") || "{}");
 
       if (!user?.id) {
-        alert("Please login first");
+        alert("Please Login First");
         return;
       }
 
@@ -79,34 +72,32 @@ export const Marketplace = () => {
           userId: user.id,
           name: user.name,
           phone: user.phone,
-          message: "Interested in this material",
+          message: "Interested In This Material",
         }),
       });
 
       if (!res.ok) throw new Error();
 
-      alert("Request sent successfully");
-    } catch (err) {
-      console.error(err);
-      alert("Request failed");
+      alert("Request Sent Successfully");
+    } catch {
+      alert("Request Failed");
     }
   };
-
-  /* -------------------- UI -------------------- */
 
   return (
     <div className="space-y-6">
       {/* HEADER */}
       <div>
-        <h1 className="text-2xl font-semibold">Marketplace</h1>
+        <h1 className="text-2xl md:text-3xl font-semibold">Marketplace</h1>
+
         <p className="text-sm text-muted">
-          Browse and exchange reusable materials
+          Browse And Exchange Reusable Materials
         </p>
       </div>
 
       {/* SEARCH */}
       <Input
-        placeholder="Search materials or location"
+        placeholder="Search Materials Or Location"
         icon={<Search />}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
@@ -129,70 +120,62 @@ export const Marketplace = () => {
         ))}
       </div>
 
-      {/* STATES */}
-
+      {/* LIST */}
       {loading ? (
-        <p className="text-sm text-muted text-center">Loading listings...</p>
+        <p className="text-sm text-muted text-center">Loading Listings...</p>
       ) : filteredListings.length === 0 ? (
-        <p className="text-sm text-muted text-center">No listings available</p>
+        <p className="text-sm text-muted text-center">No Listings Available</p>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredListings.map((item) => {
             const title = item.title || item.name || "Material";
 
             return (
-              <Card
-                key={item._id}
-                className="overflow-hidden border border-border hover:shadow-md transition"
-              >
-                {/* IMAGE */}
+              <Card key={item._id}>
                 <div className="relative h-44 bg-slate-100">
-                  <img
-                    src={item.images?.[0] || "https://picsum.photos/400"}
-                    className="w-full h-full object-cover"
-                  />
+                  {item.images?.[0] ? (
+                    <img
+                      src={item.images[0]}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                      <span className="text-gray-400">No Image Available</span>
+                    </div>
+                  )}
 
                   <Badge className="absolute top-2 left-2">
                     {item.category}
                   </Badge>
 
-                  <Badge className="absolute top-2 right-2 bg-secondary/10 text-secondary">
-                    {item.status || "available"}
+                  <Badge className="absolute top-2 right-2">
+                    {item.status || "Available"}
                   </Badge>
                 </div>
 
-                {/* CONTENT */}
                 <div className="p-4 space-y-2">
-                  <div className="flex justify-between items-start">
-                    <h3 className="font-medium">{title}</h3>
-                    <Info size={16} className="text-muted" />
-                  </div>
+                  <h3 className="font-medium">{title}</h3>
 
-                  <p className="text-xs text-muted flex items-center">
+                  <p className="text-xs flex items-center">
                     <MapPin size={14} className="mr-1" />
                     {item.location}
                   </p>
 
                   <p className="text-sm font-medium text-primary">
-                    {`${item.quantity} kg`}
+                    {item.quantity} kg
                   </p>
 
-                  {/* PHONE */}
                   {item.phone && (
-                    <p className="text-sm flex items-center text-muted">
+                    <p className="text-sm flex items-center">
                       <Phone size={14} className="mr-1" />
                       {item.phone}
                     </p>
                   )}
 
-                  {/* ACTIONS */}
                   <div className="flex gap-2 pt-2">
                     {item.phone && (
                       <a href={`tel:${item.phone}`} className="flex-1">
-                        <Button className="w-full">
-                          <Phone size={14} className="mr-1" />
-                          Call
-                        </Button>
+                        <Button className="w-full">Call</Button>
                       </a>
                     )}
 

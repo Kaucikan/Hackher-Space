@@ -6,8 +6,6 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 
-/* -------------------- TYPES -------------------- */
-
 type Message = {
   id: number;
   sender: "me" | "them";
@@ -22,25 +20,22 @@ type Contact = {
   phone: string;
 };
 
-/* -------------------- COMPONENT -------------------- */
-
 export const Messages = () => {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [activeContact, setActiveContact] = useState<Contact | null>(null);
 
   const [messages, setMessages] = useState<Record<string, Message[]>>({});
+
   const [input, setInput] = useState("");
   const [search, setSearch] = useState("");
 
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  /* -------------------- AUTO SCROLL -------------------- */
-
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    bottomRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
   }, [messages, activeContact]);
-
-  /* -------------------- LOAD CONTACTS -------------------- */
 
   useEffect(() => {
     const loadContacts = async () => {
@@ -69,14 +64,12 @@ export const Messages = () => {
           setActiveContact(reqUsers[0]);
         }
       } catch {
-        console.log("No contacts");
+        console.log("No Contacts");
       }
     };
 
     loadContacts();
   }, []);
-
-  /* -------------------- SEND -------------------- */
 
   const sendMessage = () => {
     if (!input.trim() || !activeContact) return;
@@ -99,21 +92,19 @@ export const Messages = () => {
     setInput("");
   };
 
-  /* -------------------- FILTER -------------------- */
-
   const filtered = contacts.filter((c) =>
     c.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
-    <div className="flex h-[80vh] gap-6">
+    <div className="flex flex-col md:flex-row h-[80vh] gap-4 md:gap-6">
       {/* CONTACTS */}
-      <Card className="w-72 p-0 flex flex-col">
+      <Card className="w-full md:w-72 p-0 flex flex-col">
         <div className="p-4 border-b">
           <h2 className="text-sm font-semibold mb-3">Messages</h2>
 
           <Input
-            placeholder="Search contacts"
+            placeholder="Search Contacts"
             icon={<Search />}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -122,7 +113,7 @@ export const Messages = () => {
 
         <div className="flex-1 overflow-y-auto">
           {filtered.length === 0 && (
-            <p className="text-sm text-muted p-4">No contacts</p>
+            <p className="text-sm text-muted p-4">No Contacts</p>
           )}
 
           {filtered.map((c) => (
@@ -180,7 +171,7 @@ export const Messages = () => {
             <div className="flex-1 p-4 space-y-4 overflow-y-auto bg-slate-50">
               {(messages[activeContact.id] || []).length === 0 && (
                 <p className="text-center text-sm text-muted">
-                  Start a conversation
+                  Start A Conversation
                 </p>
               )}
 
@@ -195,6 +186,7 @@ export const Messages = () => {
                   )}
                 >
                   <p>{msg.text}</p>
+
                   <div className="text-[10px] opacity-60 mt-1">{msg.time}</div>
                 </div>
               ))}
@@ -207,7 +199,7 @@ export const Messages = () => {
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Type a message"
+                placeholder="Type A Message"
                 className="flex-1"
               />
 
@@ -218,7 +210,7 @@ export const Messages = () => {
           </>
         ) : (
           <div className="flex items-center justify-center h-full text-muted">
-            No contact selected
+            No Contact Selected
           </div>
         )}
       </Card>

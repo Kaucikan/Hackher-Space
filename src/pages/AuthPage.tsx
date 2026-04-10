@@ -2,16 +2,17 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import { Mail, Lock, User, Leaf, Eye, EyeOff } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 
-/* API */
-
 const API = import.meta.env.VITE_API || "https://hackher-space-be.onrender.com";
 
 export const AuthPage = ({ type }: { type: "login" | "register" }) => {
+  const { t } = useTranslation();
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -24,19 +25,17 @@ export const AuthPage = ({ type }: { type: "login" | "register" }) => {
 
   const navigate = useNavigate();
 
-  /* HANDLERS */
-
   const handleChange = (key: string, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
   const validate = () => {
-    if (!form.email.includes("@")) return "Enter a valid email address";
+    if (!form.email.includes("@")) return "Enter Valid Email Address";
 
     if (form.password.length < 6)
-      return "Password must be at least 6 characters";
+      return "Password Must Be At Least 6 Characters";
 
-    if (type === "register" && !form.name) return "Name is required";
+    if (type === "register" && !form.name) return "Organization Name Required";
 
     return "";
   };
@@ -59,95 +58,69 @@ export const AuthPage = ({ type }: { type: "login" | "register" }) => {
 
       const res = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(
           type === "login"
-            ? { email: form.email, password: form.password }
+            ? {
+                email: form.email,
+                password: form.password,
+              }
             : form,
         ),
       });
 
       const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.error || data.message || "Authentication failed");
-      }
+      if (!res.ok) throw new Error();
 
-      /* USER EXTRACTION */
+      const user = data.user || data;
 
-      const user = data.user ||
-        data.data || {
-          id: data.id,
-          name: data.name,
-          email: data.email,
-        };
-
-      const userId = user.id || user._id;
-
-      if (!userId) throw new Error("Invalid server response");
-
-      /* STORE USER */
-
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          id: userId,
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-        }),
-      );
+      localStorage.setItem("user", JSON.stringify(user));
 
       navigate("/dashboard");
-    } catch (err: any) {
-      setError(err.message || "Authentication failed");
+    } catch {
+      setError("Authentication Failed");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 bg-background relative overflow-hidden">
-      {/* BACKGROUND */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute -top-24 -left-24 w-80 h-80 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-secondary/10 rounded-full blur-3xl" />
-      </div>
-
+    <div className="min-h-screen flex items-center justify-center px-4 bg-background">
       <motion.div
-        initial={{ opacity: 0, scale: 0.96 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         className="w-full max-w-md"
       >
         {/* HEADER */}
         <div className="text-center mb-6">
-          <Link to="/" className="inline-flex items-center gap-2 mb-3">
-            <div className="bg-primary p-2 rounded-lg">
-              <Leaf className="text-white w-5 h-5" />
-            </div>
-
-            <span className="text-xl font-semibold">
-              Waste<span className="text-primary">Exchange</span>
-            </span>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 mb-3 font-semibold"
+          >
+            <Leaf />
+            WasteExchange
           </Link>
 
-          <h2 className="text-lg sm:text-xl font-semibold">
-            {type === "login" ? "Welcome back" : "Create an account"}
+          <h2 className="text-xl md:text-2xl font-semibold">
+            {type === "login" ? "Welcome Back" : "Create Account"}
           </h2>
 
           <p className="text-sm text-muted">
             {type === "login"
-              ? "Access your dashboard and manage listings"
-              : "Register to start managing waste efficiently"}
+              ? "Login To Continue"
+              : "Register To Start Using Platform"}
           </p>
         </div>
 
-        {/* FORM */}
-        <Card className="p-5 sm:p-6 border border-border shadow-sm">
+        {/* CARD */}
+        <Card className="p-5 md:p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             {type === "register" && (
               <Input
-                placeholder="Organization name"
+                placeholder="Organization / Company Name"
                 icon={<User />}
                 value={form.name}
                 onChange={(e) => handleChange("name", e.target.value)}
@@ -155,18 +128,16 @@ export const AuthPage = ({ type }: { type: "login" | "register" }) => {
             )}
 
             <Input
-              type="email"
-              placeholder="Email address"
+              placeholder="Email Address"
               icon={<Mail />}
               value={form.email}
               onChange={(e) => handleChange("email", e.target.value)}
             />
 
-            {/* PASSWORD */}
             <div className="relative">
               <Input
                 type={showPassword ? "text" : "password"}
-                placeholder="Password"
+                placeholder="Enter Password"
                 icon={<Lock />}
                 value={form.password}
                 onChange={(e) => handleChange("password", e.target.value)}
@@ -175,52 +146,50 @@ export const AuthPage = ({ type }: { type: "login" | "register" }) => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3 text-muted"
+                className="absolute right-3 top-3"
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
 
-            {error && (
-              <div className="text-sm text-red-600 bg-red-50 border border-red-200 p-2 rounded-md text-center">
-                {error}
-              </div>
-            )}
+            {error && <div className="text-sm text-red-500">{error}</div>}
 
-            <Button className="w-full h-11">
+            <Button className="w-full py-5 text-base" disabled={isLoading}>
               {isLoading
                 ? "Processing..."
                 : type === "login"
-                  ? "Sign in"
-                  : "Create account"}
+                  ? "Sign In"
+                  : "Create Account"}
             </Button>
-          </form>
-        </Card>
 
-        {/* FOOTER */}
-        <div className="text-center text-sm mt-5 text-muted space-y-1">
-          {type === "login" ? (
-            <>
-              <Link to="/forgot-password" className="text-primary block">
+            {type === "login" && (
+              <Link
+                to="/forgot-password"
+                className="text-sm text-primary block text-center"
+              >
                 Forgot Password?
               </Link>
+            )}
 
-              <p>
-                No account?{" "}
-                <Link to="/register" className="text-primary font-medium">
-                  Register
-                </Link>
-              </p>
-            </>
-          ) : (
-            <p>
-              Already registered?{" "}
-              <Link to="/login" className="text-primary font-medium">
-                Sign in
-              </Link>
-            </p>
-          )}
-        </div>
+            <div className="text-sm text-center">
+              {type === "login" ? (
+                <>
+                  Don't Have An Account?{" "}
+                  <Link to="/register" className="text-primary">
+                    Register
+                  </Link>
+                </>
+              ) : (
+                <>
+                  Already Have An Account?{" "}
+                  <Link to="/login" className="text-primary">
+                    Sign In
+                  </Link>
+                </>
+              )}
+            </div>
+          </form>
+        </Card>
       </motion.div>
     </div>
   );

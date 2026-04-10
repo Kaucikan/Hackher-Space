@@ -22,11 +22,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 
-/* -------------------- CONFIG -------------------- */
-
 const API = import.meta.env.VITE_API || "https://hackher-space-be.onrender.com";
-
-/* -------------------- TYPES -------------------- */
 
 type Stats = {
   wasteListed: number;
@@ -39,8 +35,6 @@ type Impact = {
   co2: number;
   waste: number;
 };
-
-/* -------------------- COMPONENT -------------------- */
 
 export const Dashboard = () => {
   const [user, setUser] = useState<any>(null);
@@ -55,21 +49,17 @@ export const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  /* LOAD USER */
-
   useEffect(() => {
     const u = getUser();
 
     if (!u) {
-      setError("User not logged in");
+      setError("User Not Logged In");
       setLoading(false);
       return;
     }
 
     setUser(u);
   }, []);
-
-  /* FETCH DATA */
 
   useEffect(() => {
     if (!user?.id) return;
@@ -79,7 +69,9 @@ export const Dashboard = () => {
         const [carbonRes, impactRes, statsRes] = await Promise.all([
           fetch(`${API}/api/carbon`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify({ type: "individual" }),
           }),
           fetch(`${API}/api/impact/${user.id}`),
@@ -91,6 +83,7 @@ export const Dashboard = () => {
         const statsData = await statsRes.json();
 
         setCarbon(Number(carbonData?.total_carbon || 0));
+
         setImpactData(impact || []);
 
         setStats({
@@ -99,7 +92,7 @@ export const Dashboard = () => {
           earnings: statsData?.earnings || 0,
         });
       } catch {
-        setError("Failed to load dashboard data");
+        setError("Failed To Load Dashboard Data");
       } finally {
         setLoading(false);
       }
@@ -108,26 +101,23 @@ export const Dashboard = () => {
     fetchData();
   }, [user]);
 
-  /* STATES */
-
   if (loading)
     return (
-      <div className="text-center mt-10 text-muted">Loading dashboard...</div>
+      <div className="text-center mt-10 text-muted">Loading Dashboard...</div>
     );
 
   if (error)
     return <div className="text-center mt-10 text-red-600">{error}</div>;
-
-  /* UI */
 
   return (
     <div className="space-y-6">
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
         <div>
-          <h1 className="text-2xl font-semibold">Dashboard</h1>
-          <p className="text-sm text-muted">
-            Overview of your sustainability metrics
+          <h1 className="text-2xl md:text-3xl font-semibold">Dashboard</h1>
+
+          <p className="text-sm md:text-base text-muted">
+            Overview Of Your Sustainability Metrics
           </p>
         </div>
 
@@ -211,12 +201,12 @@ export const Dashboard = () => {
         {/* SIMULATION */}
         <Card>
           <CardHeader>
-            <CardTitle>Simulation</CardTitle>
+            <CardTitle>Digital Twin Simulation</CardTitle>
           </CardHeader>
 
           <CardContent className="space-y-3">
             <p className="text-sm text-muted">
-              Run predictive analysis to optimize waste reuse and emissions.
+              Run Predictive Analysis To Optimize Waste Reuse And Emissions.
             </p>
 
             <Link to="/dashboard/digital-twin">
@@ -228,8 +218,6 @@ export const Dashboard = () => {
     </div>
   );
 };
-
-/* STAT CARD */
 
 const StatCard = ({
   title,
@@ -244,6 +232,7 @@ const StatCard = ({
     <div className="flex justify-between items-start">
       <div>
         <p className="text-xs text-muted">{title}</p>
+
         <h2 className="text-lg md:text-xl font-semibold mt-1">{value}</h2>
       </div>
 

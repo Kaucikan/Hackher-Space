@@ -33,14 +33,14 @@ export const LandingPage = () => {
           className="w-full max-w-6xl text-center"
         >
           {/* TITLE */}
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
             Intelligent Waste Exchange Platform
           </h1>
 
           {/* SUBTEXT */}
-          <p className="text-gray-200 mb-8 max-w-2xl mx-auto text-sm sm:text-base">
-            Track emissions, simulate environmental impact, and convert waste
-            into reusable resources.
+          <p className="text-gray-200 mb-8 max-w-2xl mx-auto text-sm sm:text-base md:text-lg">
+            Track Emissions, Simulate Environmental Impact, And Convert Waste
+            Into Reusable Resources.
           </p>
 
           {/* BUTTONS */}
@@ -67,19 +67,19 @@ export const LandingPage = () => {
             <FeatureCard
               icon={<Globe />}
               title="Carbon Tracking"
-              desc="Measure emissions in real time"
+              desc="Measure Emissions In Real Time"
             />
 
             <FeatureCard
               icon={<Cpu />}
               title="Simulation Engine"
-              desc="Optimize using digital twin models"
+              desc="Optimize Using Digital Twin Models"
             />
 
             <FeatureCard
               icon={<Recycle />}
               title="Waste Exchange"
-              desc="Convert waste into resources"
+              desc="Convert Waste Into Resources"
             />
           </div>
         </motion.div>
@@ -88,7 +88,7 @@ export const LandingPage = () => {
   );
 };
 
-/* ---------- FEATURE CARD ---------- */
+/* FEATURE CARD */
 
 const FeatureCard = ({ icon, title, desc }: any) => (
   <Card

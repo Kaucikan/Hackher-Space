@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Leaf, Zap, Truck, Factory } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -11,6 +12,7 @@ type CarbonResult = {
 };
 
 export default function CarbonCalculator() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [type, setType] = useState<"individual" | "industry">("individual");
@@ -26,8 +28,6 @@ export default function CarbonCalculator() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  /* -------------------- INPUT -------------------- */
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({
       ...form,
@@ -35,49 +35,46 @@ export default function CarbonCalculator() {
     });
   };
 
-  /* -------------------- CALCULATE -------------------- */
+  const calculate = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
- const calculate = async () => {
-   try {
-     setLoading(true);
-     setError("");
+      const res = await fetch(
+        "https://hackher-space-be.onrender.com/api/carbon",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...form,
+            type,
+          }),
+        },
+      );
 
-     const res = await fetch(
-       "https://hackher-space-be.onrender.com/api/carbon",
-       {
-         method: "POST",
-         headers: {
-           "Content-Type": "application/json",
-         },
-         body: JSON.stringify({
-           ...form,
-           type,
-         }),
-       },
-     );
+      const data = await res.json();
+      setResult(data);
 
-     const data = await res.json();
-     setResult(data);
-
-     /* SAVE TO MONGODB DIGITAL TWIN */
-     await fetch("https://hackher-space-be.onrender.com/api/digital-twin", {
-       method: "POST",
-       headers: {
-         "Content-Type": "application/json",
-       },
-       body: JSON.stringify({
-         material: "Carbon Emission",
-         quantity: Number(data.total_carbon),
-         location: type,
-         status: data.suggestion,
-       }),
-     });
-   } catch {
-     setError("Failed to calculate carbon footprint");
-   } finally {
-     setLoading(false);
-   }
- };
+      await fetch("https://hackher-space-be.onrender.com/api/digital-twin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          material: "Carbon Emission",
+          quantity: Number(data.total_carbon),
+          location: type,
+          status: data.suggestion,
+        }),
+      });
+    } catch {
+      setError("Carbon Calculation Failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const reset = () => {
     setForm({
@@ -93,13 +90,16 @@ export default function CarbonCalculator() {
     <div className="max-w-3xl mx-auto space-y-6">
       {/* HEADER */}
       <div>
-        <h1 className="text-2xl font-semibold">Carbon Calculator</h1>
-        <p className="text-sm text-muted">
-          Estimate your carbon footprint and simulate environmental impact
+        <h1 className="text-2xl md:text-3xl font-semibold">
+          Carbon Calculator
+        </h1>
+
+        <p className="text-sm md:text-base text-muted">
+          Estimate Your Carbon Emissions From Daily Activities
         </p>
       </div>
 
-      {/* TYPE */}
+      {/* TYPE SELECT */}
       <div className="grid grid-cols-2 gap-3">
         <TypeButton
           active={type === "individual"}
@@ -126,21 +126,21 @@ export default function CarbonCalculator() {
               <InputField
                 icon={<Truck />}
                 name="transport"
-                placeholder="Daily travel distance (km) e.g. 20"
+                placeholder="Travel Distance (km)"
                 onChange={handleChange}
               />
 
               <InputField
                 icon={<Zap />}
                 name="electricity"
-                placeholder="Electricity usage (kWh per day) e.g. 5"
+                placeholder="Electricity Usage (kWh)"
                 onChange={handleChange}
               />
 
               <InputField
                 icon={<Leaf />}
                 name="waste"
-                placeholder="Waste generated (kg per week) e.g. 2"
+                placeholder="Waste Generated (kg)"
                 onChange={handleChange}
               />
             </>
@@ -149,14 +149,14 @@ export default function CarbonCalculator() {
               <InputField
                 icon={<Factory />}
                 name="industryEnergy"
-                placeholder="Industry energy consumption (kWh)"
+                placeholder="Industry Energy Usage (kWh)"
                 onChange={handleChange}
               />
 
               <InputField
                 icon={<Leaf />}
                 name="waste"
-                placeholder="Industrial waste generated (kg)"
+                placeholder="Industrial Waste (kg)"
                 onChange={handleChange}
               />
             </>
@@ -165,7 +165,7 @@ export default function CarbonCalculator() {
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <div className="flex gap-3 pt-2">
-            <Button onClick={calculate} className="flex-1">
+            <Button onClick={calculate} className="flex-1 py-5 text-base">
               {loading ? "Calculating..." : "Calculate Carbon"}
             </Button>
 
@@ -204,7 +204,7 @@ export default function CarbonCalculator() {
 const TypeButton = ({ active, onClick, label }: any) => (
   <button
     onClick={onClick}
-    className={`py-2 rounded-md text-sm font-medium border transition ${
+    className={`py-3 rounded-md text-sm font-medium border transition ${
       active
         ? "bg-primary text-white border-primary"
         : "bg-white border-border hover:bg-muted"
@@ -214,7 +214,7 @@ const TypeButton = ({ active, onClick, label }: any) => (
   </button>
 );
 
-/* INPUT */
+/* INPUT FIELD */
 
 const InputField = ({ icon, name, placeholder, onChange }: any) => (
   <div className="relative">
@@ -225,19 +225,7 @@ const InputField = ({ icon, name, placeholder, onChange }: any) => (
       name={name}
       placeholder={placeholder}
       onChange={onChange}
-      className="
-      w-full 
-      pl-10 
-      px-3 
-      py-2 
-      border 
-      border-border 
-      rounded-md 
-      bg-background
-      focus:outline-none 
-      focus:ring-2 
-      focus:ring-primary
-      "
+      className="w-full pl-10 px-3 py-2 border border-border rounded-md bg-background"
     />
   </div>
 );

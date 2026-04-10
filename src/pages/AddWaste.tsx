@@ -1,16 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPin, Package, Trash2, Plus, Phone } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { getUser } from "@/lib/utils";
 
-/* API */
-
 const API = import.meta.env.VITE_API || "https://hackher-space-be.onrender.com";
-
-/* TYPES */
 
 type FormData = {
   material: string;
@@ -23,6 +20,7 @@ type FormData = {
 };
 
 export const AddWaste = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [images, setImages] = useState<string[]>([]);
@@ -39,8 +37,6 @@ export const AddWaste = () => {
     phone: "",
   });
 
-  /* CHANGE */
-
   const handleChange = (key: keyof FormData, value: string) => {
     setForm((prev) => ({
       ...prev,
@@ -48,25 +44,22 @@ export const AddWaste = () => {
     }));
   };
 
-  /* IMAGE UPLOAD */
-
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files) return;
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImages((prev) => [...prev, reader.result as string]);
-    };
-
-    reader.readAsDataURL(file);
+    Array.from(files).forEach((file) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImages((prev) => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
   const removeImage = (index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
-
-  /* SUBMIT */
 
   const handleSubmit = async () => {
     if (
@@ -76,7 +69,12 @@ export const AddWaste = () => {
       !form.location ||
       !form.phone
     ) {
-      setError("Please fill all required fields");
+      setError("Please Fill Required Fields");
+      return;
+    }
+
+    if (form.phone.length < 8) {
+      setError("Enter Valid Phone Number");
       return;
     }
 
@@ -99,45 +97,43 @@ export const AddWaste = () => {
           quantityLabel: `${form.quantity} ${form.unit}`,
           location: form.location,
           description: form.description,
-          images: images,
+          images,
           phone: form.phone,
           userId: user?.id,
         }),
       });
 
-      const data = await res.json();
-
       if (!res.ok) throw new Error();
 
       navigate("/dashboard/listings");
-    } catch (err) {
-      console.error(err);
-      setError("Failed to create listing");
+    } catch {
+      setError("Failed To Create Listing");
     } finally {
       setLoading(false);
     }
   };
 
-  /* UI */
-
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* HEADER */}
       <div>
-        <h1 className="text-2xl font-semibold">Add Waste Listing</h1>
-        <p className="text-sm text-muted">
-          Create a listing to reuse materials
+        <h1 className="text-2xl md:text-3xl font-semibold">
+          Add Waste Listing
+        </h1>
+
+        <p className="text-sm md:text-base text-muted">
+          Create Listing For Reusable Materials
         </p>
       </div>
 
       {error && (
-        <div className="text-sm text-red-600 bg-red-50 border border-red-200 p-3 rounded-md">
+        <div className="text-sm text-red-600 bg-red-50 border p-3 rounded">
           {error}
         </div>
       )}
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* FORM */}
+        {/* LEFT */}
         <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
@@ -145,21 +141,19 @@ export const AddWaste = () => {
             </CardHeader>
 
             <CardContent className="space-y-4">
-              {/* MATERIAL */}
               <input
-                placeholder="Material name"
+                placeholder="Material Name (Eg: Steel Scrap)"
                 value={form.material}
                 onChange={(e) => handleChange("material", e.target.value)}
                 className="w-full px-3 py-2 border rounded-md"
               />
 
-              {/* CATEGORY */}
               <select
                 value={form.category}
                 onChange={(e) => handleChange("category", e.target.value)}
                 className="w-full px-3 py-2 border rounded-md"
               >
-                <option value="">Select category</option>
+                <option value="">Select Category</option>
                 <option>Metal</option>
                 <option>Plastic</option>
                 <option>Energy</option>
@@ -167,7 +161,6 @@ export const AddWaste = () => {
                 <option>Wood</option>
               </select>
 
-              {/* QUANTITY */}
               <div className="flex gap-2">
                 <input
                   type="number"
@@ -189,31 +182,28 @@ export const AddWaste = () => {
                 </select>
               </div>
 
-              {/* LOCATION */}
               <div className="relative">
-                <MapPin className="absolute left-3 top-3 w-4 h-4 text-muted" />
+                <MapPin className="absolute left-3 top-3 w-4 h-4" />
                 <input
-                  placeholder="Location"
+                  placeholder="Pickup Location"
                   value={form.location}
                   onChange={(e) => handleChange("location", e.target.value)}
                   className="w-full pl-10 px-3 py-2 border rounded-md"
                 />
               </div>
 
-              {/* PHONE */}
               <div className="relative">
-                <Phone className="absolute left-3 top-3 w-4 h-4 text-muted" />
+                <Phone className="absolute left-3 top-3 w-4 h-4" />
                 <input
-                  placeholder="Contact number"
+                  placeholder="Contact Phone Number"
                   value={form.phone}
                   onChange={(e) => handleChange("phone", e.target.value)}
                   className="w-full pl-10 px-3 py-2 border rounded-md"
                 />
               </div>
 
-              {/* DESCRIPTION */}
               <textarea
-                placeholder="Description"
+                placeholder="Describe Material Condition, Quality..."
                 value={form.description}
                 onChange={(e) => handleChange("description", e.target.value)}
                 className="w-full px-3 py-2 border rounded-md min-h-[100px]"
@@ -230,7 +220,10 @@ export const AddWaste = () => {
             <CardContent className="grid grid-cols-3 gap-3">
               {images.map((img, i) => (
                 <div key={i} className="relative">
-                  <img src={img} className="rounded-md object-cover" />
+                  <img
+                    src={img}
+                    className="rounded-md w-full h-24 object-cover"
+                  />
 
                   <button
                     onClick={() => removeImage(i)}
@@ -244,40 +237,45 @@ export const AddWaste = () => {
               <label className="border border-dashed rounded-md flex flex-col items-center justify-center p-6 cursor-pointer">
                 <Plus />
                 <span className="text-xs">Upload</span>
-                <input type="file" hidden onChange={handleFileUpload} />
+                <input
+                  type="file"
+                  multiple
+                  hidden
+                  onChange={handleFileUpload}
+                />
               </label>
             </CardContent>
           </Card>
         </div>
 
-        {/* PREVIEW */}
+        {/* RIGHT PREVIEW */}
         <div>
           <Card className="p-4 space-y-3">
-            <div className="h-40 bg-slate-100 flex items-center justify-center rounded-md overflow-hidden">
+            <div className="h-40 bg-slate-100 flex items-center justify-center">
               {images[0] ? (
                 <img src={images[0]} className="w-full h-full object-cover" />
               ) : (
-                <Package className="text-muted" />
+                <Package />
               )}
             </div>
 
-            <h3 className="text-sm font-medium">
-              {form.material || "Material"}
-            </h3>
+            <h3 className="font-semibold">{form.material || "Material"}</h3>
 
-            <p className="text-xs text-muted">
+            <p className="text-xs">
               {form.category || "Category"} •{" "}
               {form.quantity ? `${form.quantity} ${form.unit}` : "Quantity"}
             </p>
 
-            <p className="text-xs text-muted">{form.location || "Location"}</p>
+            <p className="text-xs">{form.location || "Location"}</p>
 
-            <p className="text-xs text-muted">
-              {form.phone || "Contact number"}
-            </p>
+            <p className="text-xs">{form.phone || "Phone"}</p>
           </Card>
 
-          <Button onClick={handleSubmit} className="w-full mt-4">
+          <Button
+            onClick={handleSubmit}
+            className="w-full mt-4 py-5 text-base"
+            disabled={loading}
+          >
             {loading ? "Publishing..." : "Publish Listing"}
           </Button>
         </div>
