@@ -54,34 +54,33 @@ export const Marketplace = () => {
   }, [search, activeCategory, listings]);
 
   const sendRequest = async (id: string) => {
-    try {
-      const user = JSON.parse(localStorage.getItem("user") || "{}");
+  try {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-      if (!user?.id) {
-        alert("Please Login First");
-        return;
-      }
-
-      const res = await fetch(`${API}/listings/${id}/request`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          name: user.name,
-          phone: user.phone,
-          message: "Interested In This Material",
-        }),
-      });
-
-      if (!res.ok) throw new Error();
-
-      alert("Request Sent Successfully");
-    } catch {
-      alert("Request Failed");
+    if (!user?.id) {
+      alert("Please Login First");
+      return;
     }
-  };
+
+    const res = await fetch(`${API}/api/listings/${id}/request`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: user.name,
+        phone: user.phone,
+        message: "Interested In This Material",
+      }),
+    });
+
+    if (!res.ok) throw new Error();
+
+    alert("Request Sent Successfully");
+  } catch {
+    alert("Request Failed");
+  }
+};
 
   return (
     <div className="space-y-6">
