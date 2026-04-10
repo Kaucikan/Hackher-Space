@@ -18,9 +18,8 @@ type Listing = {
   phone?: string;
   status?: string;
 };
+const API = import.meta.env.VITE_API || "https://hackher-space-be.onrender.com";
 
-const API_URL =
-  import.meta.env.VITE_API || "https://hackher-space-be.onrender.com/api";
 
 const categories = ["All", "Metal", "Energy", "Chemical", "Plastic", "Wood"];
 
@@ -63,7 +62,7 @@ export const Marketplace = () => {
         return;
       }
 
-      const res = await fetch(`${API_URL}/listings/${id}/request`, {
+      const res = await fetch(`${API}/listings/${id}/request`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

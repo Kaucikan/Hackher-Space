@@ -19,7 +19,8 @@ export default function AIChatbot() {
     setLoading(true);
 
     try {
-      const API = import.meta.env.VITE_API || "http://localhost:5000";
+      const API =
+        import.meta.env.VITE_API || "https://hackher-space-be.onrender.com";
 
       const res = await fetch(`${API}/api/chat`, {
         method: "POST",
