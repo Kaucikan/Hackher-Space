@@ -45,6 +45,18 @@ const resources = {
       name: "Full Name",
       phone: "Phone Number",
       forgotPassword: "Forgot Password",
+      welcomeBack: "Welcome Back",
+      createAccount: "Create Account",
+      loginContinue: "Login To Continue",
+      registerStart: "Create Account To Start",
+      invalidEmail: "Invalid Email Address",
+      passwordLength: "Password Must Be At Least 6 Characters",
+      nameRequired: "Name Is Required",
+      authFailed: "Authentication Failed",
+      processing: "Processing...",
+      signIn: "Sign In",
+      noAccount: "Don't Have An Account?",
+      alreadyAccount: "Already Have An Account?",
 
       /* DASHBOARD */
       dashboard: "Dashboard",
@@ -56,12 +68,23 @@ const resources = {
       digitalTwin: "Digital Twin",
       settings: "Settings",
 
-      /* PROFILE */
-      profile: "Profile",
-      editProfile: "Edit Profile",
-      saveChanges: "Save Changes",
-      cancel: "Cancel",
-      close: "Close",
+      wasteListed: "Waste Listed",
+      wasteReused: "Waste Reused",
+      carbonSaved: "Carbon Saved",
+      earnings: "Earnings",
+      impactOverview: "Impact Overview",
+      runSimulation: "Run Simulation",
+
+      /* DIGITAL TWIN */
+      simulationDesc: "Analyze And Optimize Environmental Impact",
+      simulationResult: "Simulation Result",
+      currentEmission: "Current Emission",
+      optimizedEmission: "Optimized Emission",
+      reduction: "Reduction",
+      viewMarketplace: "View Marketplace",
+      loadingSimulation: "Loading Simulation...",
+      reuseSuggestion: "Recommended For Reuse",
+      sustainableSuggestion: "Suitable For Sustainable Use",
 
       /* STATUS */
       available: "Available",
@@ -127,6 +150,18 @@ const resources = {
       name: "பெயர்",
       phone: "தொலைபேசி",
       forgotPassword: "கடவுச்சொல் மறந்துவிட்டதா",
+      welcomeBack: "மீண்டும் வரவேற்கிறோம்",
+      createAccount: "கணக்கு உருவாக்கவும்",
+      loginContinue: "தொடர உள்நுழைக",
+      registerStart: "தொடங்க கணக்கு உருவாக்கவும்",
+      invalidEmail: "தவறான மின்னஞ்சல் முகவரி",
+      passwordLength: "கடவுச்சொல் குறைந்தது 6 எழுத்துகள் இருக்க வேண்டும்",
+      nameRequired: "பெயர் அவசியம்",
+      authFailed: "உள்நுழைவு தோல்வி",
+      processing: "செயலாக்கப்படுகிறது...",
+      signIn: "உள்நுழை",
+      noAccount: "கணக்கு இல்லையா?",
+      alreadyAccount: "ஏற்கனவே கணக்கு உள்ளதா?",
 
       /* DASHBOARD */
       dashboard: "டாஷ்போர்டு",
@@ -138,12 +173,23 @@ const resources = {
       digitalTwin: "டிஜிட்டல் ட்வின்",
       settings: "அமைப்புகள்",
 
-      /* PROFILE */
-      profile: "சுயவிவரம்",
-      editProfile: "திருத்து",
-      saveChanges: "சேமிக்கவும்",
-      cancel: "ரத்து",
-      close: "மூடு",
+      wasteListed: "பட்டியலிட்ட கழிவு",
+      wasteReused: "மீண்டும் பயன்படுத்தப்பட்டது",
+      carbonSaved: "சேமிக்கப்பட்ட கார்பன்",
+      earnings: "வருமானம்",
+      impactOverview: "தாக்கம் கண்ணோட்டம்",
+      runSimulation: "சிமுலேஷன் இயக்கவும்",
+
+      /* DIGITAL TWIN */
+      simulationDesc: "சுற்றுச்சூழல் தாக்கத்தை பகுப்பாய்வு செய்து மேம்படுத்துங்கள்",
+      simulationResult: "சிமுலேஷன் முடிவு",
+      currentEmission: "தற்போதைய வெளியீடு",
+      optimizedEmission: "மேம்படுத்தப்பட்ட வெளியீடு",
+      reduction: "குறைப்பு",
+      viewMarketplace: "சந்தையை காண்க",
+      loadingSimulation: "சிமுலேஷன் ஏற்றப்படுகிறது...",
+      reuseSuggestion: "மீண்டும் பயன்படுத்த பரிந்துரைக்கப்படுகிறது",
+      sustainableSuggestion: "நிலையான பயன்பாட்டிற்கு பொருத்தமானது",
 
       /* STATUS */
       available: "கிடைக்கும்",
