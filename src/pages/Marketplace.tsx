@@ -18,16 +18,25 @@ type Listing = {
   phone?: string;
   status?: string;
 };
-const API = import.meta.env.VITE_API || "https://hackher-space-be.onrender.com";
 
-
-const categories = ["All", "Metal", "Energy", "Chemical", "Plastic", "Wood"];
+const API =
+  import.meta.env.VITE_API ||
+  "https://hackher-space-be.onrender.com";
 
 export const Marketplace = () => {
   const { t } = useTranslation();
 
+  const categories = [
+    t("all"),
+    t("metal"),
+    t("energy"),
+    t("chemical"),
+    t("plastic"),
+    t("wood"),
+  ];
+
   const [search, setSearch] = useState("");
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory, setActiveCategory] = useState(t("all"));
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -47,55 +56,58 @@ export const Marketplace = () => {
       return (
         (title.toLowerCase().includes(text) ||
           item.location?.toLowerCase().includes(text)) &&
-        (activeCategory === "All" ||
-          item.category?.toLowerCase() === activeCategory.toLowerCase())
+        (activeCategory === t("all") ||
+          item.category?.toLowerCase() ===
+            activeCategory.toLowerCase())
       );
     });
-  }, [search, activeCategory, listings]);
+  }, [search, activeCategory, listings, t]);
 
   const sendRequest = async (id: string) => {
-  try {
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    try {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-    if (!user?.id) {
-      alert("Please Login First");
-      return;
+      if (!user?.id) {
+        alert(t("loginFirst"));
+        return;
+      }
+
+      const res = await fetch(`${API}/api/listings/${id}/request`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: user.name,
+          phone: user.phone,
+          message: t("interestedMaterial"),
+        }),
+      });
+
+      if (!res.ok) throw new Error();
+
+      alert(t("requestSent"));
+    } catch {
+      alert(t("requestFailed"));
     }
-
-    const res = await fetch(`${API}/api/listings/${id}/request`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: user.name,
-        phone: user.phone,
-        message: "Interested In This Material",
-      }),
-    });
-
-    if (!res.ok) throw new Error();
-
-    alert("Request Sent Successfully");
-  } catch {
-    alert("Request Failed");
-  }
-};
+  };
 
   return (
     <div className="space-y-6">
       {/* HEADER */}
       <div>
-        <h1 className="text-2xl md:text-3xl font-semibold">Marketplace</h1>
+        <h1 className="text-2xl md:text-3xl font-semibold">
+          {t("marketplace")}
+        </h1>
 
         <p className="text-sm text-muted">
-          Browse And Exchange Reusable Materials
+          {t("subtitle")}
         </p>
       </div>
 
       {/* SEARCH */}
       <Input
-        placeholder="Search Materials Or Location"
+        placeholder={t("search")}
         icon={<Search />}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
@@ -120,13 +132,17 @@ export const Marketplace = () => {
 
       {/* LIST */}
       {loading ? (
-        <p className="text-sm text-muted text-center">Loading Listings...</p>
+        <p className="text-sm text-muted text-center">
+          {t("loading")}
+        </p>
       ) : filteredListings.length === 0 ? (
-        <p className="text-sm text-muted text-center">No Listings Available</p>
+        <p className="text-sm text-muted text-center">
+          {t("noListings")}
+        </p>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredListings.map((item) => {
-            const title = item.title || item.name || "Material";
+            const title = item.title || item.name || t("material");
 
             return (
               <Card key={item._id}>
@@ -138,7 +154,9 @@ export const Marketplace = () => {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                      <span className="text-gray-400">No Image Available</span>
+                      <span className="text-gray-400">
+                        {t("noListings")}
+                      </span>
                     </div>
                   )}
 
@@ -147,7 +165,7 @@ export const Marketplace = () => {
                   </Badge>
 
                   <Badge className="absolute top-2 right-2">
-                    {item.status || "Available"}
+                    {item.status || t("available")}
                   </Badge>
                 </div>
 
@@ -160,7 +178,7 @@ export const Marketplace = () => {
                   </p>
 
                   <p className="text-sm font-medium text-primary">
-                    {item.quantity} kg
+                    {t("quantity")} {item.quantity} kg
                   </p>
 
                   {item.phone && (
@@ -173,7 +191,9 @@ export const Marketplace = () => {
                   <div className="flex gap-2 pt-2">
                     {item.phone && (
                       <a href={`tel:${item.phone}`} className="flex-1">
-                        <Button className="w-full">Call</Button>
+                        <Button className="w-full">
+                          {t("call")}
+                        </Button>
                       </a>
                     )}
 
@@ -182,7 +202,7 @@ export const Marketplace = () => {
                       className="flex-1"
                       onClick={() => sendRequest(item._id)}
                     >
-                      Request
+                      {t("request")}
                     </Button>
 
                     <Button variant="outline" size="icon">
