@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 
-const API = import.meta.env.VITE_API || "https://hackher-space-be.onrender.com";
+const API =
+  import.meta.env.VITE_API ||
+  "https://hackher-space-be.onrender.com";
 
 export const AuthPage = ({ type }: { type: "login" | "register" }) => {
   const { t } = useTranslation();
@@ -30,12 +32,14 @@ export const AuthPage = ({ type }: { type: "login" | "register" }) => {
   };
 
   const validate = () => {
-    if (!form.email.includes("@")) return "Enter Valid Email Address";
+    if (!form.email.includes("@"))
+      return t("invalidEmail");
 
     if (form.password.length < 6)
-      return "Password Must Be At Least 6 Characters";
+      return t("passwordLength");
 
-    if (type === "register" && !form.name) return "Organization Name Required";
+    if (type === "register" && !form.name)
+      return t("nameRequired");
 
     return "";
   };
@@ -54,7 +58,9 @@ export const AuthPage = ({ type }: { type: "login" | "register" }) => {
 
     try {
       const url =
-        type === "login" ? `${API}/api/auth/login` : `${API}/api/auth/register`;
+        type === "login"
+          ? `${API}/api/auth/login`
+          : `${API}/api/auth/register`;
 
       const res = await fetch(url, {
         method: "POST",
@@ -67,7 +73,7 @@ export const AuthPage = ({ type }: { type: "login" | "register" }) => {
                 email: form.email,
                 password: form.password,
               }
-            : form,
+            : form
         ),
       });
 
@@ -81,7 +87,7 @@ export const AuthPage = ({ type }: { type: "login" | "register" }) => {
 
       navigate("/dashboard");
     } catch {
-      setError("Authentication Failed");
+      setError(t("authFailed"));
     } finally {
       setIsLoading(false);
     }
@@ -105,61 +111,81 @@ export const AuthPage = ({ type }: { type: "login" | "register" }) => {
           </Link>
 
           <h2 className="text-xl md:text-2xl font-semibold">
-            {type === "login" ? "Welcome Back" : "Create Account"}
+            {type === "login"
+              ? t("welcomeBack")
+              : t("createAccount")}
           </h2>
 
           <p className="text-sm text-muted">
             {type === "login"
-              ? "Login To Continue"
-              : "Register To Start Using Platform"}
+              ? t("loginContinue")
+              : t("registerStart")}
           </p>
         </div>
 
-        {/* CARD */}
         <Card className="p-5 md:p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             {type === "register" && (
               <Input
-                placeholder="Organization / Company Name"
+                placeholder={t("organizationName")}
                 icon={<User />}
                 value={form.name}
-                onChange={(e) => handleChange("name", e.target.value)}
+                onChange={(e) =>
+                  handleChange("name", e.target.value)
+                }
               />
             )}
 
             <Input
-              placeholder="Email Address"
+              placeholder={t("email")}
               icon={<Mail />}
               value={form.email}
-              onChange={(e) => handleChange("email", e.target.value)}
+              onChange={(e) =>
+                handleChange("email", e.target.value)
+              }
             />
 
             <div className="relative">
               <Input
                 type={showPassword ? "text" : "password"}
-                placeholder="Enter Password"
+                placeholder={t("password")}
                 icon={<Lock />}
                 value={form.password}
-                onChange={(e) => handleChange("password", e.target.value)}
+                onChange={(e) =>
+                  handleChange("password", e.target.value)
+                }
               />
 
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
+                onClick={() =>
+                  setShowPassword(!showPassword)
+                }
                 className="absolute right-3 top-3"
               >
-                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                {showPassword ? (
+                  <EyeOff size={16} />
+                ) : (
+                  <Eye size={16} />
+                )}
               </button>
             </div>
 
-            {error && <div className="text-sm text-red-500">{error}</div>}
+            {error && (
+              <div className="text-sm text-red-500">
+                {error}
+              </div>
+            )}
 
-            <Button className="w-full py-5 text-base" disabled={isLoading}>
+            <Button
+              className="w-full py-5 text-base"
+              disabled={isLoading}
+            >
               {isLoading
-                ? "Processing..."
+                ? t("processing")
                 : type === "login"
-                  ? "Sign In"
-                  : "Create Account"}
+                ? t("signIn")
+                : t("createAccount")}
             </Button>
 
             {type === "login" && (
@@ -167,23 +193,29 @@ export const AuthPage = ({ type }: { type: "login" | "register" }) => {
                 to="/forgot-password"
                 className="text-sm text-primary block text-center"
               >
-                Forgot Password?
+                {t("forgotPassword")}
               </Link>
             )}
 
             <div className="text-sm text-center">
               {type === "login" ? (
                 <>
-                  Don't Have An Account?{" "}
-                  <Link to="/register" className="text-primary">
-                    Register
+                  {t("noAccount")}{" "}
+                  <Link
+                    to="/register"
+                    className="text-primary"
+                  >
+                    {t("register")}
                   </Link>
                 </>
               ) : (
                 <>
-                  Already Have An Account?{" "}
-                  <Link to="/login" className="text-primary">
-                    Sign In
+                  {t("alreadyAccount")}{" "}
+                  <Link
+                    to="/login"
+                    className="text-primary"
+                  >
+                    {t("signIn")}
                   </Link>
                 </>
               )}
