@@ -46,10 +46,16 @@ export const Sidebar = () => {
 
   const [user, setUser] = useState<any>(null);
   const [open, setOpen] = useState(false);
+  const [lang, setLang] = useState(i18n.language);
 
   useEffect(() => {
     setUser(getUser());
   }, []);
+
+  const changeLang = (lng: string) => {
+    i18n.changeLanguage(lng);
+    setLang(lng);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -139,9 +145,9 @@ export const Sidebar = () => {
         <div className="p-3 border-t space-y-2">
           {/* LANGUAGE SWITCH */}
           <select
-            onChange={(e) => i18n.changeLanguage(e.target.value)}
+            value={lang}
+            onChange={(e) => changeLang(e.target.value)}
             className="w-full border rounded-xl px-3 py-2 text-sm"
-            defaultValue={i18n.language}
           >
             <option value="en">English</option>
             <option value="ta">தமிழ்</option>
