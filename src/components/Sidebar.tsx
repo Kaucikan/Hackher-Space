@@ -21,13 +21,13 @@ import { useTranslation } from "react-i18next";
 /* MENU */
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
-  { icon: ShoppingBag, label: "Marketplace", path: "/dashboard/marketplace" },
-  { icon: PlusCircle, label: "Add Waste", path: "/dashboard/add" },
-  { icon: History, label: "My Listings", path: "/dashboard/listings" },
-  { icon: Globe, label: "Carbon Tracker", path: "/dashboard/carbon" },
-  { icon: Cpu, label: "Digital Twin", path: "/dashboard/digital-twin" },
-  { icon: MessageSquare, label: "Messages", path: "/dashboard/messages" },
+  { icon: LayoutDashboard, key: "dashboard", path: "/dashboard" },
+  { icon: ShoppingBag, key: "marketplace", path: "/dashboard/marketplace" },
+  { icon: PlusCircle, key: "addWaste", path: "/dashboard/add" },
+  { icon: History, key: "myListings", path: "/dashboard/listings" },
+  { icon: Globe, key: "carbon", path: "/dashboard/carbon" },
+  { icon: Cpu, key: "digitalTwin", path: "/dashboard/digital-twin" },
+  { icon: MessageSquare, key: "messages", path: "/dashboard/messages" },
 ];
 
 const getUser = () => {
@@ -39,6 +39,8 @@ const getUser = () => {
 };
 
 export const Sidebar = () => {
+  const { t, i18n } = useTranslation();
+
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -127,7 +129,7 @@ export const Sidebar = () => {
                 )}
               >
                 <Icon className="w-5 h-5" />
-                <span className="ml-3">{item.label}</span>
+                <span className="ml-3">{t(item.key)}</span>
               </Link>
             );
           })}
@@ -135,20 +137,32 @@ export const Sidebar = () => {
 
         {/* FOOTER */}
         <div className="p-3 border-t space-y-2">
+          {/* LANGUAGE SWITCH */}
+          <select
+            onChange={(e) => i18n.changeLanguage(e.target.value)}
+            className="w-full border rounded-xl px-3 py-2 text-sm"
+            defaultValue={i18n.language}
+          >
+            <option value="en">English</option>
+            <option value="ta">தமிழ்</option>
+          </select>
+
+          {/* SETTINGS */}
           <button className="w-full flex items-center px-3 py-3 rounded-xl hover:bg-slate-100">
             <Settings className="w-5 h-5" />
             <span className="ml-3 text-sm md:text-base">
-              Settings
+              {t("settings")}
             </span>
           </button>
 
+          {/* LOGOUT */}
           <button
             onClick={handleLogout}
             className="w-full flex items-center px-3 py-3 rounded-xl text-red-500 hover:bg-red-50"
           >
             <LogOut className="w-5 h-5" />
             <span className="ml-3 text-sm md:text-base">
-              Logout
+              {t("logout")}
             </span>
           </button>
         </div>
