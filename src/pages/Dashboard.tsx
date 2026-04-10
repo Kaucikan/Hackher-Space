@@ -21,26 +21,19 @@ import {
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { useTranslation } from "react-i18next";
 
-const API = import.meta.env.VITE_API || "https://hackher-space-be.onrender.com";
-
-type Stats = {
-  wasteListed: number;
-  wasteReused: number;
-  earnings: number;
-};
-
-type Impact = {
-  name: string;
-  co2: number;
-  waste: number;
-};
+const API =
+  import.meta.env.VITE_API ||
+  "https://hackher-space-be.onrender.com";
 
 export const Dashboard = () => {
+  const { t } = useTranslation();
+
   const [user, setUser] = useState<any>(null);
   const [carbon, setCarbon] = useState<number>(0);
-  const [impactData, setImpactData] = useState<Impact[]>([]);
-  const [stats, setStats] = useState<Stats>({
+  const [impactData, setImpactData] = useState<any[]>([]);
+  const [stats, setStats] = useState({
     wasteListed: 0,
     wasteReused: 0,
     earnings: 0,
@@ -53,7 +46,7 @@ export const Dashboard = () => {
     const u = getUser();
 
     if (!u) {
-      setError("User Not Logged In");
+      setError(t("loginFirst"));
       setLoading(false);
       return;
     }
@@ -69,9 +62,7 @@ export const Dashboard = () => {
         const [carbonRes, impactRes, statsRes] = await Promise.all([
           fetch(`${API}/api/carbon`, {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ type: "individual" }),
           }),
           fetch(`${API}/api/impact/${user.id}`),
@@ -83,7 +74,6 @@ export const Dashboard = () => {
         const statsData = await statsRes.json();
 
         setCarbon(Number(carbonData?.total_carbon || 0));
-
         setImpactData(impact || []);
 
         setStats({
@@ -92,7 +82,7 @@ export const Dashboard = () => {
           earnings: statsData?.earnings || 0,
         });
       } catch {
-        setError("Failed To Load Dashboard Data");
+        setError(t("requestFailed"));
       } finally {
         setLoading(false);
       }
@@ -103,7 +93,9 @@ export const Dashboard = () => {
 
   if (loading)
     return (
-      <div className="text-center mt-10 text-muted">Loading Dashboard...</div>
+      <div className="text-center mt-10 text-muted">
+        {t("loading")}
+      </div>
     );
 
   if (error)
@@ -114,26 +106,30 @@ export const Dashboard = () => {
       {/* HEADER */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3">
         <div>
-          <h1 className="text-2xl md:text-3xl font-semibold">Dashboard</h1>
+          <h1 className="text-2xl md:text-3xl font-semibold">
+            {t("dashboard")}
+          </h1>
 
           <p className="text-sm md:text-base text-muted">
-            Overview Of Your Sustainability Metrics
+            {t("subtitle")}
           </p>
         </div>
 
         <div className="flex flex-wrap gap-2">
           <Link to="/dashboard/carbon">
-            <Button variant="outline">Carbon</Button>
+            <Button variant="outline">{t("carbon")}</Button>
           </Link>
 
           <Link to="/dashboard/digital-twin">
-            <Button variant="outline">Simulation</Button>
+            <Button variant="outline">
+              {t("digitalTwin")}
+            </Button>
           </Link>
 
           <Link to="/dashboard/add">
             <Button>
               <PlusCircle className="w-4 h-4 mr-2" />
-              Add Listing
+              {t("addWaste")}
             </Button>
           </Link>
         </div>
@@ -142,32 +138,34 @@ export const Dashboard = () => {
       {/* STATS */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <StatCard
-          title="Waste Listed"
+          title={t("wasteListed")}
           value={`${stats.wasteListed} kg`}
           icon={<Recycle />}
         />
 
         <StatCard
-          title="Waste Reused"
+          title={t("wasteReused")}
           value={`${stats.wasteReused} kg`}
           icon={<TrendingUp />}
         />
 
-        <StatCard title="Carbon Saved" value={`${carbon} kg`} icon={<Leaf />} />
+        <StatCard
+          title={t("carbonSaved")}
+          value={`${carbon} kg`}
+          icon={<Leaf />}
+        />
 
         <StatCard
-          title="Earnings"
+          title={t("earnings")}
           value={`₹${stats.earnings}`}
           icon={<DollarSign />}
         />
       </div>
 
-      {/* GRID */}
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* CHART */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Impact Overview</CardTitle>
+            <CardTitle>{t("impactOverview")}</CardTitle>
           </CardHeader>
 
           <CardContent className="h-[280px] md:h-[320px]">
@@ -198,19 +196,20 @@ export const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* SIMULATION */}
         <Card>
           <CardHeader>
-            <CardTitle>Digital Twin Simulation</CardTitle>
+            <CardTitle>{t("digitalTwin")}</CardTitle>
           </CardHeader>
 
           <CardContent className="space-y-3">
             <p className="text-sm text-muted">
-              Run Predictive Analysis To Optimize Waste Reuse And Emissions.
+              {t("simulationDesc")}
             </p>
 
             <Link to="/dashboard/digital-twin">
-              <Button className="w-full">Run Simulation</Button>
+              <Button className="w-full">
+                {t("runSimulation")}
+              </Button>
             </Link>
           </CardContent>
         </Card>
@@ -219,21 +218,14 @@ export const Dashboard = () => {
   );
 };
 
-const StatCard = ({
-  title,
-  value,
-  icon,
-}: {
-  title: string;
-  value: string;
-  icon: React.ReactNode;
-}) => (
+const StatCard = ({ title, value, icon }: any) => (
   <Card className="p-4 md:p-5 border border-border hover:shadow-sm transition">
     <div className="flex justify-between items-start">
       <div>
         <p className="text-xs text-muted">{title}</p>
-
-        <h2 className="text-lg md:text-xl font-semibold mt-1">{value}</h2>
+        <h2 className="text-lg md:text-xl font-semibold mt-1">
+          {value}
+        </h2>
       </div>
 
       <div className="text-primary">{icon}</div>
